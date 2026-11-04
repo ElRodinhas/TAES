@@ -1,109 +1,134 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#17352b" />
-    <meta name="description" content="Set up household preferences for a local-first Smart Pantry." />
-    <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="icon" type="image/png" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./styles.css" />
-    <script src="./app.js" defer></script>
-    <title>Smart Pantry</title>
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="header-inner">
-        <div class="brand" aria-label="Smart Pantry">Smart Pantry</div>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#17352b" />
+  <meta name="description" content="Set up household preferences for a local-first Smart Pantry." />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./app.js" defer></script>
+  <title>Smart Pantry</title> 
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand" aria-label="Smart Pantry">Smart Pantry</div>
+    </div>
+  </header>
+
+  <main class="main" id="main-content">
+    <section id="setup-screen" aria-labelledby="setup-title" data-testid="onboarding-screen" hidden>
+      <div class="intro">
+        <p class="eyebrow" id="setup-step">GETTING STARTED · 1 OF 1</p>
+        <h1 id="setup-title">Set up your household profile</h1>
+        <p id="setup-description">Tell us who you cook for. We'll use these preferences to suggest suitable recipes and
+          serving sizes.</p>
       </div>
-    </header>
 
-    <main class="main" id="main-content">
-      <section id="setup-screen" aria-labelledby="setup-title" data-testid="onboarding-screen" hidden>
-        <div class="intro">
-          <p class="eyebrow" id="setup-step">GETTING STARTED · 1 OF 1</p>
-          <h1 id="setup-title">Set up your household profile</h1>
-          <p id="setup-description">Tell us who you cook for. We'll use these preferences to suggest suitable recipes and serving sizes.</p>
-        </div>
-
-        <form id="household-form" novalidate>
-          <div class="form-card">
-            <div class="field">
-              <label for="household-name">Profile name <span class="required">*</span></label>
-              <input id="household-name" name="householdName" data-testid="household-name" type="text" value="My household" required maxlength="60" autocomplete="off" aria-describedby="name-help name-error" />
-              <p class="help-text" id="name-help">For example: My household, Family, or Flatmates.</p>
-              <p class="field-error" id="name-error" data-testid="name-error" role="alert" hidden></p>
-            </div>
-
-            <div class="field">
-              <label for="serving-count">Typical number of servings <span class="required">*</span></label>
-              <input id="serving-count" name="servingCount" data-testid="serving-count" type="number" min="1" max="30" step="1" inputmode="numeric" placeholder="e.g. 4" required aria-describedby="servings-help serving-error" />
-              <p class="help-text" id="servings-help">How many people do you normally cook for? Enter a whole number from 1 to 30.</p>
-              <p class="field-error" id="servings-error" data-testid="servings-error" role="alert" hidden></p>
-            </div>
-
-            <div class="field">
-              <label for="dietary-lifestyle">Dietary lifestyle</label>
-              <select id="dietary-lifestyle" name="dietaryLifestyle" data-testid="dietary-lifestyle">
-                <option value="omnivore">No specific diet</option>
-                <option value="vegetarian">Vegetarian</option>
-                <option value="vegan">Vegan</option>
-                <option value="pescatarian">Pescatarian</option>
-              </select>
-            </div>
-
-            <fieldset class="field allergies">
-              <legend>Food allergies <span class="optional">(optional)</span></legend>
-              <p class="help-text">Select any that apply. Leave all unchecked if there are none.</p>
-              <div class="checkbox-grid">
-                <label class="checkbox-option"><input type="checkbox" name="allergies" value="Milk" data-testid="allergy-milk" /> Milk</label>
-                <label class="checkbox-option"><input type="checkbox" name="allergies" value="Eggs" data-testid="allergy-eggs" /> Eggs</label>
-                <label class="checkbox-option"><input type="checkbox" name="allergies" value="Peanuts" data-testid="allergy-peanuts" /> Peanuts</label>
-                <label class="checkbox-option"><input type="checkbox" name="allergies" value="Tree nuts" data-testid="allergy-tree-nuts" /> Tree nuts</label>
-                <label class="checkbox-option"><input type="checkbox" name="allergies" value="Wheat" data-testid="allergy-wheat" /> Wheat</label>
-                <label class="checkbox-option"><input type="checkbox" name="allergies" value="Soy" data-testid="allergy-soy" /> Soy</label>
-                <label class="checkbox-option"><input type="checkbox" name="allergies" value="Fish" data-testid="allergy-fish" /> Fish</label>
-                <label class="checkbox-option"><input type="checkbox" name="allergies" value="Shellfish" data-testid="allergy-shellfish" /> Shellfish</label>
-                <label class="checkbox-option"><input type="checkbox" name="allergies" value="Sesame" data-testid="allergy-sesame" /> Sesame</label>
-              </div>
-            </fieldset>
-
-            <div class="field last-field">
-              <label for="excluded-ingredients">Ingredients to avoid <span class="optional">(optional)</span></label>
-              <textarea id="excluded-ingredients" name="excludedIngredients" data-testid="excluded-ingredients" rows="2" maxlength="500" placeholder="e.g. mushrooms, coriander" aria-describedby="exclusions-help"></textarea>
-              <p class="help-text" id="exclusions-help">Separate ingredients with commas.</p>
-            </div>
+      <form id="household-form" novalidate>
+        <div class="form-card">
+          <div class="field">
+            <label for="household-name">Profile name <span class="required">*</span></label>
+            <input id="household-name" name="householdName" data-testid="household-name" type="text"
+              value="My household" required maxlength="60" autocomplete="off" aria-describedby="name-help name-error" />
+            <p class="help-text" id="name-help">For example: My household, Family, or Flatmates.</p>
+            <p class="field-error" id="name-error" data-testid="name-error" role="alert" hidden></p>
           </div>
 
-          <p id="form-error" data-testid="form-error" class="form-error" role="alert" hidden></p>
-          <div class="form-actions">
-            <button id="cancel-setup" data-testid="cancel-setup" type="button" class="button button-secondary" hidden>Cancel</button>
-            <button id="save-household" data-testid="save-household" type="submit" class="button button-primary">Save household</button>
+          <div class="field">
+            <label for="serving-count">Typical number of servings <span class="required">*</span></label>
+            <input id="serving-count" name="servingCount" data-testid="serving-count" type="number" min="1" max="30"
+              step="1" inputmode="numeric" placeholder="e.g. 4" required
+              aria-describedby="servings-help serving-error" />
+            <p class="help-text" id="servings-help">How many people do you normally cook for? Enter a whole number from
+              1 to 30.</p>
+            <p class="field-error" id="servings-error" data-testid="servings-error" role="alert" hidden></p>
           </div>
-        </form>
-      </section>
 
-      <section id="households-screen" aria-labelledby="households-title" data-testid="households-screen" hidden>
-        <div class="intro">
-          <h1 id="households-title">Your profiles</h1>
-          <p>Your profile is ready. You can add more profiles, edit preferences, or change which profile is active.</p>
+          <div class="field">
+            <label for="dietary-lifestyle">Dietary lifestyle</label>
+            <select id="dietary-lifestyle" name="dietaryLifestyle" data-testid="dietary-lifestyle">
+              <option value="omnivore">No specific diet</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="vegan">Vegan</option>
+              <option value="pescatarian">Pescatarian</option>
+            </select>
+          </div>
+
+          <fieldset class="field allergies">
+            <legend>Food allergies <span class="optional">(optional)</span></legend>
+            <p class="help-text">Select any that apply. Leave all unchecked if there are none.</p>
+            <div class="checkbox-grid">
+              <label class="checkbox-option"><input type="checkbox" name="allergies" value="Milk"
+                  data-testid="allergy-milk" /> Milk</label>
+              <label class="checkbox-option"><input type="checkbox" name="allergies" value="Eggs"
+                  data-testid="allergy-eggs" /> Eggs</label>
+              <label class="checkbox-option"><input type="checkbox" name="allergies" value="Peanuts"
+                  data-testid="allergy-peanuts" /> Peanuts</label>
+              <label class="checkbox-option"><input type="checkbox" name="allergies" value="Tree nuts"
+                  data-testid="allergy-tree-nuts" /> Tree nuts</label>
+              <label class="checkbox-option"><input type="checkbox" name="allergies" value="Wheat"
+                  data-testid="allergy-wheat" /> Wheat</label>
+              <label class="checkbox-option"><input type="checkbox" name="allergies" value="Soy"
+                  data-testid="allergy-soy" /> Soy</label>
+              <label class="checkbox-option"><input type="checkbox" name="allergies" value="Fish"
+                  data-testid="allergy-fish" /> Fish</label>
+              <label class="checkbox-option"><input type="checkbox" name="allergies" value="Shellfish"
+                  data-testid="allergy-shellfish" /> Shellfish</label>
+              <label class="checkbox-option"><input type="checkbox" name="allergies" value="Sesame"
+                  data-testid="allergy-sesame" /> Sesame</label>
+            </div>
+          </fieldset>
+
+          <div class="field last-field">
+            <label for="excluded-ingredients">Ingredients to avoid <span class="optional">(optional)</span></label>
+            <textarea id="excluded-ingredients" name="excludedIngredients" data-testid="excluded-ingredients" rows="2"
+              maxlength="500" placeholder="e.g. mushrooms, coriander" aria-describedby="exclusions-help"></textarea>
+            <p class="help-text" id="exclusions-help">Separate ingredients with commas.</p>
+          </div>
         </div>
 
-        <section class="active-card" aria-labelledby="active-title">
-          <p class="eyebrow">DEFAULT PROFILE</p>
-          <h2 id="active-title" data-testid="active-household-name"></h2>
-          <p id="active-description" data-testid="active-household-summary"></p>
-        </section>
-
-        <div class="list-heading">
-          <h2>Manage profiles</h2>
-          <button id="add-household" data-testid="add-household" class="button button-secondary" type="button">Add profile</button>
+        <p id="form-error" data-testid="form-error" class="form-error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button id="cancel-setup" data-testid="cancel-setup" type="button" class="button button-secondary"
+            hidden>Cancel</button>
+          <button id="save-household" data-testid="save-household" type="submit" class="button button-primary">Save
+            household</button>
         </div>
-        <div id="household-list" data-testid="household-list" class="household-list"></div>
-        <p class="storage-note">Data is kept on this device only. Clearing the browser's site data will remove these profiles.</p>
-        <p id="manager-error" data-testid="manager-error" role="alert" class="form-error" hidden></p>
+      </form>
+    </section>
+
+    <section id="households-screen" aria-labelledby="households-title" data-testid="households-screen" hidden>
+      <div class="intro">
+        <h1 id="households-title">Your profiles</h1>
+        <p>Your profile is ready. You can add more profiles, edit preferences, or change which profile is active.</p>
+      </div>
+
+      <section class="active-card" aria-labelledby="active-title">
+        <p class="eyebrow">DEFAULT PROFILE</p>
+        <h2 id="active-title" data-testid="active-household-name"></h2>
+        <p id="active-description" data-testid="active-household-summary"></p>
       </section>
-    </main>
-    <footer class="footer"></footer>
-  </body>
+
+      <div class="list-heading">
+        <h2>Manage profiles</h2>
+        <button id="open-scanner-btn" data-testid="open-scanner-btn" class="button button-primary" type="button">Scan
+          Product 📷</button>
+        <button id="add-household" data-testid="add-household" class="button button-secondary" type="button">Add
+          profile</button>
+      </div>
+      <div id="household-list" data-testid="household-list" class="household-list"></div>
+      <p class="storage-note">Data is kept on this device only. Clearing the browser's site data will remove these
+        profiles.</p>
+      <p id="manager-error" data-testid="manager-error" role="alert" class="form-error" hidden></p>
+    </section>
+
+  </main>
+  <footer class="footer"></footer>
+</body>
+
 </html>

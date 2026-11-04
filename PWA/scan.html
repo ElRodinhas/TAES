@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#17352b">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/png" href="./icons/icon-192.png">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Smart Pantry - Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand" aria-label="Smart Pantry">Smart Pantry</div>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- NOTA: Removi o atributo "hidden" desta secção -->
+        <section id="scanner-screen" aria-labelledby="scanner-title" data-testid="scanner-screen">
+            <div class="intro">
+                <h1 id="scanner-title">SmartPantry - Scanner de Produtos</h1>
+                <p>Aponte a câmara para o código de barras ou insira os dados manualmente:</p>
+                <div id="reader"></div>
+            </div>
+
+            <div class="form-card" style="margin-top: 15px;">
+                <div class="field">
+                    <label for="manualBarcode">Ou digite o código de barras manualmente:</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="manualBarcode" data-testid="manual-barcode-input" placeholder="Ex: 5601234567890" style="flex: 1;">
+                        <button type="button" id="lookupBarcodeBtn" class="button button-secondary" onclick="manualLookup()">Procurar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field" style="margin-top: 15px;">
+                <label for="barcodeFile">Ou carregue uma foto do código de barras:</label>
+                <input type="file" id="barcodeFile" accept="image/*" capture="environment">
+            </div>
+            <p id="scanner-msg" role="alert" hidden></p>
+            
+            <button type="button" id="cancel-scanner" class="button button-secondary" style="margin-top: 15px;">Cancelar</button>
+
+            <div class="result-box" id="formContainer" style="display:none; margin-top: 15px;">
+                <h3>Validar Produto</h3>
+                <form id="productForm" onsubmit="saveProduct(event)">
+                    <div class="field">
+                        <label>Código de Barras:</label>
+                        <input type="text" id="barcodeVal" data-testid="barcode-input" required>
+                    </div>
+                    <div class="field">
+                        <label>Nome do Produto:</label>
+                        <input type="text" id="productName" data-testid="input-item-name" required>
+                    </div>
+                    <div class="field">
+                        <label>Categoria:</label>
+                        <input type="text" id="productCategory" data-testid="input-item-category">
+                    </div>
+                    <div class="field">
+                        <label>Quantidade:</label>
+                        <input type="number" id="productQty" data-testid="input-item-qty" value="1" min="1" required>
+                    </div>
+                    <div class="field">
+                        <label>Data de Validade:</label>
+                        <input type="date" id="productExpiry" data-testid="input-item-expiry" required>
+                    </div>
+                    <button type="submit" id="btn-save-item" data-testid="btn-save-item" class="button button-primary">Guardar na Despensa</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- O scanner.js TEM de estar aqui -->
+    <script src="./scanner.js"></script>
+</body>
+</html>

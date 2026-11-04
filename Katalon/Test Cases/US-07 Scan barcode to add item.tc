@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>US-07 Scan barcode to add item</name>
+   <tag></tag>
+   <comment></comment>
+   <origin>WEB_RECORDER</origin>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>a5f6ae99-3b82-4af2-934e-4cea6d0ed8ac</testCaseGuid>
+</TestCaseEntity>
