@@ -246,18 +246,56 @@ window.manualLookup = async function () {
 
 window.saveProduct = function (event) {
     event.preventDefault();
+    const formMsg = $id('form-msg');
+
+    //Rejeitar item sem nome
+    const nameVal = $id('productName').value.trim();
+    if (!nameVal) {
+        formMsg.textContent = 'Erro: O nome do produto é obrigatório.';
+        formMsg.className = 'error';
+        formMsg.hidden = false;
+        
+        limparMensagem(); 
+        return; 
+    }
+
+    // Criar o objeto do produto
     const product = {
-        barcode: $id('barcodeVal').value,
-        name: $id('productName').value,
-        category: $id('productCategory').value,
-        quantity: $id('productQty').value,
-        expiry: $id('productExpiry').value
+        id: Date.now().toString(), // Identificador único
+        barcode: $id('barcodeVal').value || null,
+        name: nameVal,
+        category: $id('productCategory').value || 'Geral',
+        quantity: $id('productQty') ? $id('productQty').value : 1,
+        expiry: $id('productExpiry') ? $id('productExpiry').value : null
     };
 
-    console.log('Produto guardado localmente:', product);
+    // 1. Ir buscar o inventário atual à cache do browser (ou iniciar array vazio)
+    let pantryInventory = JSON.parse(localStorage.getItem('smartPantry_inventory')) || [];
     
-    // Mostra a mensagem de sucesso na própria página (sem bloquear o browser)
-    mostrarMensagem(`Sucesso! "${product.name}" guardado na despensa.`);
+    // 2. Verificar se o produto já existe pelo nome (case-insensitive)
+    const existingProductIndex = pantryInventory.findIndex(
+        item => item.name.toLowerCase() === product.name.toLowerCase()
+    );
+
+    if (existingProductIndex !== -1) {
+        pantryInventory[existingProductIndex].quantity = 
+            Number(pantryInventory[existingProductIndex].quantity) + Number(product.quantity);
+        if(product.expiry) {
+           pantryInventory[existingProductIndex].expiry = product.expiry;
+        }
+    } else {
+        // Se não existe, adiciona como novo
+        pantryInventory.push(product);
+    }
+    
+    // 3. Guardar no localStorage
+    localStorage.setItem('smartPantry_inventory', JSON.stringify(pantryInventory));
+
+    formMsg.textContent = `Sucesso! "${product.name}" guardado na despensa.`;
+    formMsg.className = 'success';
+    formMsg.hidden = false;
+    
+    limparMensagem();
 
     const productForm = $id('productForm');
     if (productForm) productForm.reset();
@@ -266,9 +304,16 @@ window.saveProduct = function (event) {
 
     // Espera 2 segundos para o utilizador ver a mensagem e depois redireciona
     setTimeout(() => {
-        fecharScanner();
+        window.location.href = './pantry.html';
     }, 2000);
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Se a secção do scanner existir nesta página, liga a câmara automaticamente
+    if ($id('scanner-screen')) {
+        iniciarScanner();
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     // Se a secção do scanner existir nesta página, liga a câmara automaticamente
