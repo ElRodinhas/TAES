@@ -59,3 +59,11 @@ dkms.conf
 /.classpath
 .svn/
 .cache/
+
+# Katalon
+Katalon/Libs/
+Katalon/bin/
+Katalon/.settings/
+Katalon/settings/
+Katalon/report/
+Katalon/console.properties
