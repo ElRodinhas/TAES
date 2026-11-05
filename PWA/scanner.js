@@ -87,6 +87,10 @@ document.addEventListener('click', (event) => {
     if (alvo.id === 'cancel-scanner') {
         fecharScanner();
     }
+
+    if (alvo.id === 'restart-scanner-btn') {
+        reiniciarScanner();
+    }
 });
 
 // ---------- Câmara ----------
@@ -109,8 +113,16 @@ async function iniciarScanner() {
     await pararCamara();
 
     try {
+
+         const cameras = await Html5Qrcode.getCameras();
+        
+        if (!cameras || cameras.length === 0) {
+            throw new Error('Nenhuma câmara encontrada.');
+        }
+        const cameraId = cameras[cameras.length - 1].id;
+
         await leitor.start(
-            { facingMode: 'environment' },
+            cameraId,
             { fps: 10, qrbox: { width: 250, height: 150 } },
             onScanSuccess,
             onScanFailure
@@ -128,6 +140,19 @@ async function iniciarScanner() {
     }
 }
 
+async function reiniciarScanner() {
+    esconderFormulario();
+    const restartBtn = $id('restart-scanner-container');
+    if (restartBtn) restartBtn.style.display = 'none';
+    
+    limparMensagem();
+    const form = $id('productForm');
+    if (form) form.reset();
+    
+    //Liga a câmara novamente
+    await iniciarScanner();
+}
+
 function onScanFailure() {
     // Ignorado: dispara a cada frame sem código visível.
 }
@@ -140,6 +165,9 @@ async function onScanSuccess(decodedText) {
 
     console.log(`Código detetado: ${decodedText}`);
     await pararCamara();
+
+    const restartBtn = $id('restart-scanner-container');
+    if (restartBtn) restartBtn.style.display = 'block';
 
     mostrarFormulario();
     limparMensagem();
