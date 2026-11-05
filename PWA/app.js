@@ -315,6 +315,13 @@
   if (state.households.length === 0) startForm('initial');
   else renderHouseholds();
 
+  const openScannerBtn = $('open-scanner-btn');
+  if (openScannerBtn) {
+    openScannerBtn.addEventListener('click', () => {
+      window.location.href = './scan.html';
+    });
+  }
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js').catch(() => {

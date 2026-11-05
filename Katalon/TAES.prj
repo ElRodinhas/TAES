@@ -6,11 +6,12 @@
    <UUID>f2d9a533-597e-4cd0-972e-37bbfc250f85</UUID>
    <createdEdition>ENTERPRISE</createdEdition>
    <createdVersion>11.0.0</createdVersion>
-   <freeLicense>false</freeLicense>
+   <freeLicense>true</freeLicense>
    <migratedVersion>5.9.0</migratedVersion>
    <modifiedEdition>ENTERPRISE</modifiedEdition>
    <modifiedVersion>11.0.0</modifiedVersion>
    <pageLoadTimeout>0</pageLoadTimeout>
+   <projectFileLocation>C:\Users\ASUS\Desktop\TAES\TAES\Katalon\TAES.prj</projectFileLocation>
    <sourceContent>
       <sourceFolderList>
          <sourceFolderConfiguration>
