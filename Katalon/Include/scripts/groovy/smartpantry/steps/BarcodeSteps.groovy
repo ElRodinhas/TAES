@@ -50,8 +50,6 @@ class BarcodeSteps {
 		// Espera que o formulário (onde estão os resultados) apareça
 		WebUI.waitForElementVisible(createTestObject("formContainer"), 10)
 		
-		// CORREÇÃO: Usar WebDriverWait do Selenium para esperar que a API responda
-		// e o valor do input mude de "A procurar produto..." para o nome real.
 		WebDriverWait wait = new WebDriverWait(DriverFactory.getWebDriver(), Duration.ofSeconds(15))
 		wait.until(ExpectedConditions.not(ExpectedConditions.attributeToBe(
 			By.id("productName"), "value", "A procurar produto..."
@@ -106,7 +104,6 @@ class BarcodeSteps {
 		
 		String productName = WebUI.getAttribute(createTestObject("productName"), 'value')
 		
-		// CORREÇÃO: Usar verifyEqual para não "rebentar" o teste caso o produto exista
 		WebUI.verifyEqual(productName.isEmpty() || productName == "", true, FailureHandling.CONTINUE_ON_FAILURE)
 		
 		// A mensagem de produto não encontrado deve estar visível
