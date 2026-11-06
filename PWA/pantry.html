@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#17352b">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/png" href="./icons/icon-192.png">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Smart Pantry - A Minha Despensa</title>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand" aria-label="Smart Pantry">Smart Pantry</div>
+        </div>
+    </header>
+
+    <main class="main">
+        <section id="pantry-screen" aria-labelledby="pantry-title" data-testid="pantry-screen">
+            <div class="intro">
+                <h1 id="pantry-title">A Minha Despensa</h1>
+                <p>Aqui estão os itens que guardaste:</p>
+            </div>
+
+            <div id="pantry-list" class="result-box" style="margin-top: 15px;">
+                <!-- Os produtos vão aparecer aqui injetados pelo JavaScript -->
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <button type="button" class="button button-primary" onclick="window.location.href='./scan.html'">
+                    + Adicionar Novo Produto
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script src="./pantry.js"></script>
+</body>
+</html>
