@@ -72,6 +72,8 @@ Katalon/.cache/
 Katalon/.classpath
 Katalon/Object Repository/Page_Directory listing for/
 Katalon/Object Repository/Page_Smart Pantry/
+Katalon/settings/internal/
+Katalon/.project
 
 # Operating system files
 .DS_Store
