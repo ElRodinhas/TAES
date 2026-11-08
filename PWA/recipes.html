@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#17352b">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/png" href="./icons/icon-192.png">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Smart Pantry - Receitas</title>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand" aria-label="Smart Pantry">Smart Pantry</div>
+            <nav>
+                <a href="./pantry.html" class="button button-secondary" style="text-decoration: none;">Voltar à Despensa</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section id="recipes-screen" aria-labelledby="recipes-title">
+            <div class="intro">
+                <h1 id="recipes-title">O que posso cozinhar?</h1>
+                <p>Receitas sugeridas com base no stock atual da tua despensa. Os produtos quase a expirar aparecem primeiro.</p>
+            </div>
+
+            <div class="form-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <p style="margin: 0;"><strong>Receitas encontradas:</strong> <span id="recipe-count">0</span></p>
+                <button id="btn-fetch-recipes" class="button button-primary" type="button">Procurar Receitas 🔍</button>
+            </div>
+
+            <!-- Mensagem de erro/sucesso -->
+            <p id="recipe-msg" role="alert" hidden></p>
+
+            <!-- Loading Spinner -->
+            <div id="loading-recipes" style="display: none; text-align: center; padding: 20px;">
+                <p>A procurar as melhores receitas para ti...</p>
+            </div>
+
+           
+            <div id="recipes-list" class="household-list" style="margin-top: 20px;">
+                <!-- Aqui serão inseridas as receitas encontradas -->
+                
+            </div>
+        </section>
+    </main>
+
+    <script src="./recipes.js"></script>
+</body>
+
+</html>
