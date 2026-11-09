@@ -30,7 +30,7 @@ Feature: Barcode Scanning and Form Auto-fill
     When the user scans a known barcode "5449000000996"
     Then the item form should be auto-filled with product details
 
-    Scenario: Edit auto-filled data before saving
+  Scenario: Edit auto-filled data before saving
     When the user scans a known barcode "5449000000996"
     And edits the item name to "Produto Editado Teste"
     And fills the required form fields

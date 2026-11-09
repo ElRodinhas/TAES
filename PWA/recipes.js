@@ -83,7 +83,7 @@ async function procurarReceitas() {
                     
                     <div style="margin-bottom: 12px;">
                         <div style="display: flex; justify-content: space-between; font-size: 0.85em; font-weight: bold; color: #17352b; margin-bottom: 4px;">
-                            <span>Tens ${analise.percentagem}% dos ingredientes</span>
+                            <span id="overlap-value">Tens ${analise.percentagem}% dos ingredientes</span>
                         </div>
                         <div style="width: 100%; background-color: #e0e0e0; border-radius: 10px; height: 10px; overflow: hidden;">
                             <div style="width: ${analise.percentagem}%; background-color: ${analise.percentagem > 50 ? '#2e7d32' : '#e65100'}; height: 100%; border-radius: 10px; transition: width 0.5s ease-in-out;"></div>

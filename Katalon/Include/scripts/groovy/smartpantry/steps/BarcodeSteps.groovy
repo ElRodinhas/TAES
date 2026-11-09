@@ -114,17 +114,15 @@ class BarcodeSteps {
 
 	@Then("the item should be saved with the updated details")
 	def itemIsSavedWithUpdatedDetails() {
-		// Usa o WebDriverWait para esperar até o URL mudar para index.html
 		try {
 			WebDriverWait wait = new WebDriverWait(DriverFactory.getWebDriver(), Duration.ofSeconds(10))
-			wait.until(ExpectedConditions.urlContains("index.html"))
+			wait.until(ExpectedConditions.urlContains("pantry.html"))
 		} catch (Exception e) {
-			KeywordUtil.markFailed("O browser não redirecionou para o index.html a tempo.")
+			KeywordUtil.markFailed("O browser não redirecionou para o pantry.html a tempo.")
 		}
 		
-		// Verificação final
 		String currentUrl = WebUI.getUrl()
-		WebUI.verifyMatch(currentUrl, ".*index\\.html", true)
+		WebUI.verifyMatch(currentUrl, ".*pantry\\.html", true)
 		
 		WebUI.closeBrowser()
 	}
