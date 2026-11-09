@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+# Node.js
+node_modules/
+
 # Object files
 *.o
 *.ko
@@ -72,6 +75,7 @@ Katalon/.cache/
 Katalon/.classpath
 Katalon/Object Repository/Page_Directory listing for/
 Katalon/Object Repository/Page_Smart Pantry/
+Katalon/.project
 
 # Operating system files
 .DS_Store
