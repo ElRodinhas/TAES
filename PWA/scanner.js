@@ -199,6 +199,25 @@ async function onScanSuccess(decodedText) {
     }
 }
 
+// ---------- Verifica a data de validade ----------
+
+function verifyExpiryDate() {
+    const dateInput = $id('productExpiry');
+    if (dateInput) {
+        const hoje = new Date();
+        
+        // Mínimo: data atual
+        const dataMinima = hoje.toISOString().split('T')[0];
+        
+        // Máximo: data atual + 30 anos
+        hoje.setFullYear(hoje.getFullYear() + 30);
+        const dataMaxima = hoje.toISOString().split('T')[0];
+        
+        dateInput.setAttribute('min', dataMinima);
+        dateInput.setAttribute('max', dataMaxima);
+    }
+}
+
 // ---------- Fallback: upload de imagem ----------
 
 document.addEventListener('change', async (event) => {
@@ -309,15 +328,12 @@ window.saveProduct = function (event) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    verifyExpiryDate();
+    
     // Se a secção do scanner existir nesta página, liga a câmara automaticamente
     if ($id('scanner-screen')) {
         iniciarScanner();
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Se a secção do scanner existir nesta página, liga a câmara automaticamente
-    if ($id('scanner-screen')) {
-        iniciarScanner();
-    }
-});
