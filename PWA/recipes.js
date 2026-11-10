@@ -144,3 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnFetch.addEventListener('click', procurarReceitas);
     }
 });
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { analisarReceita };
+}
