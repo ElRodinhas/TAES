@@ -329,7 +329,7 @@ window.saveProduct = function (event) {
     // Criar o objeto do produto
     const product = {
         id: Date.now().toString(), // Identificador único
-        barcode: $id('barcodeVal').value || null,
+        barcode: barcode || null,
         name: nameVal,
         category: $id('productCategory').value || 'Geral',
         quantity: $id('productQty') ? $id('productQty').value : 1,
@@ -338,6 +338,18 @@ window.saveProduct = function (event) {
 
     // 1. Ir buscar o inventário atual à cache do browser (ou iniciar array vazio)
     let pantryInventory = JSON.parse(localStorage.getItem('smartPantry_inventory')) || [];
+
+    if (barcode && pantryInventory.some(item =>
+        String(item.barcode ?? '').trim() === barcode &&
+        item.name.trim().toLowerCase() !== nameVal.toLowerCase()
+    )) {
+        formMsg.textContent =
+            'Erro: Este código de barras já está associado a outro produto.';
+        formMsg.className = 'error';
+        formMsg.hidden = false;
+        $id('barcodeVal').focus();
+        return;
+    }
     
     // 2. Verificar se o produto já existe pelo nome (case-insensitive)
     const existingProductIndex = pantryInventory.findIndex(
