@@ -227,7 +227,7 @@ class BarcodeSteps {
     }
 
     @After('@barcode-uniqueness')
-    def closeBarcodeUniquenessBrowser() {
+    void closeBarcodeUniquenessBrowser() {
         WebUI.closeBrowser()
     }
 }
