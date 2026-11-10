@@ -85,3 +85,56 @@ test('mantém entrada manual de produtos sem código de barras', () => {
     assert.equal(inventory[0].barcode, null);
     assert.equal(inventory[0].name, 'Leite');
 });
+
+test('rejeita o mesmo código de barras para outro produto', () => {
+    const app = criarAmbiente('4006381333931');
+    app.storage.set('smartPantry_inventory', JSON.stringify([
+        { name: 'Arroz', barcode: '4006381333931', quantity: 1 }
+    ]));
+    const antes = app.storage.get('smartPantry_inventory');
+
+    app.save();
+
+    assert.equal(app.storage.get('smartPantry_inventory'), antes);
+    assert.equal(app.fields['form-msg'].className, 'error');
+    assert.equal(app.fields['form-msg'].hidden, false);
+    assert.match(app.fields['form-msg'].textContent, /outro produto/i);
+    assert.equal(app.fields.barcodeVal.focused, true);
+});
+
+test('permite aumentar a quantidade do mesmo produto com o mesmo código', () => {
+    const app = criarAmbiente('4006381333931');
+    app.storage.set('smartPantry_inventory', JSON.stringify([
+        { name: 'leite', barcode: '4006381333931', quantity: 1 }
+    ]));
+
+    app.save();
+
+    const inventory = JSON.parse(app.storage.get('smartPantry_inventory'));
+    assert.equal(inventory.length, 1);
+    assert.equal(inventory[0].quantity, 3);
+    assert.equal(app.fields['form-msg'].className, 'success');
+});
+
+test('permite produtos diferentes com códigos diferentes', () => {
+    const app = criarAmbiente('4006381333931');
+    app.storage.set('smartPantry_inventory', JSON.stringify([
+        { name: 'Arroz', barcode: '96385074', quantity: 1 }
+    ]));
+
+    app.save();
+
+    const inventory = JSON.parse(app.storage.get('smartPantry_inventory'));
+    assert.equal(inventory.length, 2);
+    assert.equal(inventory[1].name, 'Leite');
+    assert.equal(inventory[1].barcode, '4006381333931');
+});
+
+test('remove espaços do código sem perder zeros iniciais', () => {
+    const app = criarAmbiente(' 036000291452 ');
+
+    app.save();
+
+    const inventory = JSON.parse(app.storage.get('smartPantry_inventory'));
+    assert.equal(inventory[0].barcode, '036000291452');
+});
