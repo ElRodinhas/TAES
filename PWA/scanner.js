@@ -261,6 +261,63 @@ window.manualLookup = async function () {
     onScanSuccess(codigo);
 };
 
+// ---------- Barcode Validation ----------
+
+// GTIN-8 (EAN-8), GTIN-12 (UPC-A) e GTIN-13 (EAN-13)
+// usam um dígito de controlo calculado com pesos alternados 3 e 1.
+function digitoControloValido(codigo) {
+    if (!/^\d+$/.test(codigo)) return false;
+
+    let soma = 0;
+    let peso = 3;
+    for (let i = codigo.length - 2; i >= 0; i--) {
+        soma += Number(codigo[i]) * peso;
+        peso = peso === 3 ? 1 : 3;
+    }
+
+    const esperado = (10 - (soma % 10)) % 10;
+    return esperado === Number(codigo[codigo.length - 1]);
+}
+
+// Um UPC-E de 8 dígitos contém o sistema numérico, 6 dígitos
+// comprimidos e o dígito de controlo. Expandimos para UPC-A antes
+// de verificar o dígito de controlo.
+function upcEValido(codigo) {
+    if (!/^[01]\d{7}$/.test(codigo)) return false;
+
+    const sistema = codigo[0];
+    const dados = codigo.slice(1, 7);
+    const ultimo = dados[5];
+    let corpo;
+
+    if ('012'.includes(ultimo)) {
+        corpo = sistema + dados.slice(0, 2) + ultimo + '0000' + dados.slice(2, 5);
+    } else if (ultimo === '3') {
+        corpo = sistema + dados.slice(0, 3) + '00000' + dados.slice(3, 5);
+    } else if (ultimo === '4') {
+        corpo = sistema + dados.slice(0, 4) + '00000' + dados[4];
+    } else {
+        corpo = sistema + dados.slice(0, 5) + '0000' + ultimo;
+    }
+
+    return digitoControloValido(corpo + codigo[7]);
+}
+
+function codigoBarrasValido(codigo) {
+    if (!/^\d+$/.test(codigo)) return false;
+
+    if (codigo.length === 8) {
+        // O leitor pode devolver EAN-8 ou UPC-E com 8 dígitos.
+        return digitoControloValido(codigo) || upcEValido(codigo);
+    }
+
+    if (codigo.length === 12 || codigo.length === 13) {
+        return digitoControloValido(codigo);
+    }
+
+    return false;
+}
+
 // ---------- Guardar produto ----------
 
 window.saveProduct = function (event) {
@@ -278,10 +335,20 @@ window.saveProduct = function (event) {
         return; 
     }
 
+    // Reject invalid barcode
+    const barcode = $id('barcodeVal').value.trim();
+    if (barcode && !codigoBarrasValido(barcode)) {
+        formMsg.textContent = 'Erro: Código de barras inválido. Verifique o número e o dígito de controlo (EAN-8, EAN-13, UPC-A ou UPC-E).';
+        formMsg.className = 'error';
+        formMsg.hidden = false;
+        $id('barcodeVal').focus();
+        return;
+    }
+
     // Criar o objeto do produto
     const product = {
         id: Date.now().toString(), // Identificador único
-        barcode: $id('barcodeVal').value || null,
+        barcode: barcode || null,
         name: nameVal,
         category: $id('productCategory').value || 'Geral',
         quantity: $id('productQty') ? $id('productQty').value : 1,
@@ -290,6 +357,18 @@ window.saveProduct = function (event) {
 
     // 1. Ir buscar o inventário atual à cache do browser (ou iniciar array vazio)
     let pantryInventory = JSON.parse(localStorage.getItem('smartPantry_inventory')) || [];
+
+    if (barcode && pantryInventory.some(item =>
+        String(item.barcode ?? '').trim() === barcode &&
+        item.name.trim().toLowerCase() !== nameVal.toLowerCase()
+    )) {
+        formMsg.textContent =
+            'Erro: Este código de barras já está associado a outro produto.';
+        formMsg.className = 'error';
+        formMsg.hidden = false;
+        $id('barcodeVal').focus();
+        return;
+    }
     
     // 2. Verificar se o produto já existe pelo nome (case-insensitive)
     const existingProductIndex = pantryInventory.findIndex(
