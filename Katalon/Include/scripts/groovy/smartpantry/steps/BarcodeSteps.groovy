@@ -16,10 +16,14 @@ import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.ui.WebDriverWait
 import org.openqa.selenium.support.ui.ExpectedConditions
 import java.time.Duration
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import io.cucumber.java.After
 
 class BarcodeSteps {
 	
 	String baseUrl = "http://localhost:8000/scan.html"
+    private String inventoryBeforeBarcodeSave
 
 	// ---------- HELPERS (Para criar objetos de teste facilmente) ----------
 	
@@ -35,6 +39,7 @@ class BarcodeSteps {
 	def userIsOnScannerPage() {
 		WebUI.openBrowser('')
 		WebUI.navigateToUrl(baseUrl)
+		WebUI.executeJavaScript("localStorage.removeItem('smartPantry_inventory');", null)
 		WebUI.maximizeWindow()
 		
 		// Garante que a caixa de texto manual está visível
@@ -114,17 +119,19 @@ class BarcodeSteps {
 
 	@Then("the item should be saved with the updated details")
 	def itemIsSavedWithUpdatedDetails() {
-		// Usa o WebDriverWait para esperar até o URL mudar para index.html
+		// Espera pelo destino real de um produto guardado.
 		try {
 			WebDriverWait wait = new WebDriverWait(DriverFactory.getWebDriver(), Duration.ofSeconds(10))
-			wait.until(ExpectedConditions.urlContains("index.html"))
+			wait.until(ExpectedConditions.urlContains("/pantry.html"))
 		} catch (Exception e) {
-			KeywordUtil.markFailed("O browser não redirecionou para o index.html a tempo.")
+			KeywordUtil.markFailedAndStop("O browser não redirecionou para o pantry.html a tempo.")
 		}
 		
 		// Verificação final
 		String currentUrl = WebUI.getUrl()
-		WebUI.verifyMatch(currentUrl, ".*index\\.html", true)
+		WebUI.verifyMatch(currentUrl, ".*pantry\\.html", true)
+        def inventory = new JsonSlurper().parseText(readBarcodeInventory())
+        WebUI.verifyEqual(inventory.any { it.name == 'Produto Editado Teste' }, true)
 		
 		WebUI.closeBrowser()
 	}
@@ -137,4 +144,90 @@ class BarcodeSteps {
 		// Garante que a quantidade está preenchida
 		WebUI.setText(createTestObject("productQty"), "1")
 	}
+
+    private TestObject barcodeField(String testId) {
+        TestObject field = new TestObject(testId)
+        field.addProperty('css', ConditionType.EQUALS, "[data-testid='${testId}']")
+        return field
+    }
+
+    private String readBarcodeInventory() {
+        return (String) WebUI.executeJavaScript(
+            "return localStorage.getItem('smartPantry_inventory');", null
+        )
+    }
+
+    @Given('the pantry contains Arroz with barcode {string}')
+    def seedBarcodeInventory(String barcode) {
+        def inventory = [[
+            id: 'barcode-test-product', name: 'Arroz', barcode: barcode,
+            category: 'Geral', quantity: 1, expiry: null
+        ]]
+        WebUI.executeJavaScript(
+            "localStorage.setItem('smartPantry_inventory', arguments[0]);",
+            [JsonOutput.toJson(inventory)]
+        )
+        inventoryBeforeBarcodeSave = readBarcodeInventory()
+
+        // Open manual entry without calling the external product lookup API.
+        WebUI.executeJavaScript(
+            "document.getElementById('formContainer').style.display = 'block';", null
+        )
+        WebUI.waitForElementVisible(barcodeField('input-item-name'), 10)
+    }
+
+    @When('I manually submit product {string} with barcode {string}')
+    def submitManualBarcodeProduct(String name, String barcode) {
+        WebUI.setText(barcodeField('input-item-name'), name)
+        if (barcode.isEmpty()) {
+            WebUI.clearText(barcodeField('barcode-input'))
+        } else {
+            WebUI.setText(barcodeField('barcode-input'), barcode)
+        }
+        WebUI.setText(barcodeField('input-item-category'), 'Geral')
+        WebUI.setText(barcodeField('input-item-qty'), '2')
+        WebUI.click(barcodeField('btn-save-item'))
+    }
+
+    @Then('the duplicate barcode error should be displayed')
+    def verifyDuplicateBarcodeError() {
+        TestObject message = createTestObject('form-msg')
+        WebUI.waitForElementVisible(message, 5)
+        WebUI.verifyEqual(WebUI.getAttribute(message, 'class'), 'error')
+        WebUI.verifyEqual(WebUI.getText(message),
+            'Erro: Este código de barras já está associado a outro produto.')
+        WebUI.verifyEqual(WebUI.executeJavaScript(
+            'return document.activeElement.id;', null
+        ), 'barcodeVal')
+    }
+
+    @Then('the pantry inventory should remain unchanged')
+    def verifyBarcodeInventoryUnchanged() {
+        WebUI.verifyEqual(readBarcodeInventory(), inventoryBeforeBarcodeSave)
+    }
+
+    @Then('the pantry should contain {int} products')
+    def verifyBarcodeInventoryCount(int count) {
+        WebDriverWait wait = new WebDriverWait(
+            DriverFactory.getWebDriver(), Duration.ofSeconds(10)
+        )
+        wait.until(ExpectedConditions.urlContains('/pantry.html'))
+        def inventory = new JsonSlurper().parseText(readBarcodeInventory())
+        WebUI.verifyEqual(inventory.size(), count)
+    }
+
+    @Then('pantry product {string} should have barcode {string} and quantity {int}')
+    def verifySavedBarcodeProduct(String name, String barcode, int quantity) {
+        def inventory = new JsonSlurper().parseText(readBarcodeInventory())
+        def matches = inventory.findAll { it.name.equalsIgnoreCase(name) }
+        WebUI.verifyEqual(matches.size(), 1)
+        def product = matches.first()
+        WebUI.verifyEqual(product.barcode, barcode.isEmpty() ? null : barcode)
+        WebUI.verifyEqual(product.quantity.toString(), quantity.toString())
+    }
+
+    @After('@barcode-uniqueness')
+    def closeBarcodeUniquenessBrowser() {
+        WebUI.closeBrowser()
+    }
 }

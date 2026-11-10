@@ -34,7 +34,7 @@ class HouseholdSteps {
     }
 
     // Each scenario starts independently with an empty browser household profile.
-    @Before
+    @Before('@initial-household-setup')
     void openCleanBrowser() {
         WebUI.openBrowser('')
         WebUI.navigateToUrl(BASE_URL)
@@ -42,7 +42,7 @@ class HouseholdSteps {
         WebUI.refresh()
     }
 
-    @After
+    @After('@initial-household-setup')
     void closeBrowser() {
         WebUI.closeBrowser()
     }
