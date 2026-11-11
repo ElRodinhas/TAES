@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Dashboard profile switching and shared data preservation</description>
+   <name>Switch active profile</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>15c545cf-e844-43f5-b32b-a242fd7022d7</testCaseGuid>
+</TestCaseEntity>
