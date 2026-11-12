@@ -5,13 +5,7 @@
   const STORAGE_KEY = 'smartPantry.households.v1';
   const SERVING_MIN = 1;
   const SERVING_MAX = 30;
-  const LIFESTYLES = Object.freeze({
-    omnivore: 'No specific diet',
-    vegetarian: 'Vegetarian',
-    vegan: 'Vegan',
-    pescatarian: 'Pescatarian'
-  });
-  const ALLERGY_OPTIONS = ['Milk', 'Eggs', 'Peanuts', 'Tree nuts', 'Wheat', 'Soy', 'Fish', 'Shellfish', 'Sesame'];
+  const { readStoredState, renderSwitcher, initSwitcher, LIFESTYLES } = window.SmartPantryProfiles;
   const $ = (id) => document.getElementById(id);
 
   const setupScreen = $('setup-screen');
@@ -25,36 +19,6 @@
   let mode = 'initial'; // 'initial', 'add', or 'edit'
   let editingId = null;
   let pendingDeleteId = null;
-
-  function blankState() {
-    return { version: 1, households: [], activeHouseholdId: null };
-  }
-
-  function isValidHousehold(household) {
-    return household && typeof household.id === 'string' && household.id.length > 0 &&
-      typeof household.name === 'string' && household.name.trim().length > 0 &&
-      Number.isInteger(household.servings) && household.servings >= SERVING_MIN && household.servings <= SERVING_MAX &&
-      Object.hasOwn(LIFESTYLES, household.lifestyle) &&
-      Array.isArray(household.allergies) && household.allergies.every((a) => ALLERGY_OPTIONS.includes(a)) &&
-      Array.isArray(household.excludedIngredients) && household.excludedIngredients.every((i) => typeof i === 'string');
-  }
-
-  function readStoredState() {
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (!stored) return blankState();
-      const parsed = JSON.parse(stored);
-      if (parsed.version !== 1 || !Array.isArray(parsed.households)) return blankState();
-      const households = parsed.households.filter(isValidHousehold);
-      const activeHouseholdId = households.some((h) => h.id === parsed.activeHouseholdId)
-        ? parsed.activeHouseholdId
-        : (households[0]?.id ?? null);
-      return { version: 1, households, activeHouseholdId };
-    } catch (error) {
-      // Corrupt data or disabled storage cannot falsely count as completed onboarding.
-      return blankState();
-    }
-  }
 
   function persist(nextState) {
     try {
@@ -92,6 +56,8 @@
   function switchScreen(screen) {
     setupScreen.hidden = screen !== 'setup';
     householdsScreen.hidden = screen !== 'households';
+    $('profile-switcher').hidden = screen !== 'households';
+    hideError('profile-switch-error');
   }
 
   function startForm(nextMode, household = null) {
@@ -240,6 +206,7 @@
     }
     $('active-title').textContent = active.name;
     $('active-description').textContent = householdDetails(active);
+    renderSwitcher(state);
     const list = $('household-list');
     list.replaceChildren(...state.households.map(renderHouseholdCard));
     switchScreen('households');
@@ -279,6 +246,28 @@
   $('cancel-setup').addEventListener('click', () => renderHouseholds());
   $('add-household').addEventListener('click', () => startForm('add'));
 
+  function activateHousehold(id, errorId) {
+    if (!state.households.some((household) => household.id === id)) {
+      $('active-profile').value = state.activeHouseholdId;
+      showError(errorId, 'This profile is no longer available.');
+      return;
+    }
+    if (id === state.activeHouseholdId) return;
+    if (!persist({ ...state, activeHouseholdId: id })) {
+      $('active-profile').value = state.activeHouseholdId;
+      showError(errorId, 'Could not switch profiles on this device. Please try again.');
+      return;
+    }
+    pendingDeleteId = null;
+    renderHouseholds();
+  }
+
+  initSwitcher((next) => {
+    state = next;
+    pendingDeleteId = null;
+    renderHouseholds();
+  });
+
   $('household-list').addEventListener('click', (event) => {
     const button = event.target.closest('button[data-action]');
     if (!button) return;
@@ -293,11 +282,13 @@
     } else if (action === 'cancel-delete') {
       pendingDeleteId = null;
       renderHouseholds();
-    } else if (action === 'activate' || action === 'confirm-delete') {
+    } else if (action === 'activate') {
+      activateHousehold(household.id, 'manager-error');
+    } else if (action === 'confirm-delete') {
       const next = {
         version: 1,
-        households: action === 'activate' ? state.households : state.households.filter((h) => h.id !== household.id),
-        activeHouseholdId: action === 'activate' ? household.id : state.activeHouseholdId
+        households: state.households.filter((h) => h.id !== household.id),
+        activeHouseholdId: state.activeHouseholdId
       };
       if (!next.households.some((h) => h.id === next.activeHouseholdId)) {
         next.activeHouseholdId = next.households[0]?.id ?? null;

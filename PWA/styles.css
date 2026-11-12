@@ -14,6 +14,10 @@ button { cursor: pointer; }
 .site-header { background: #fff; border-bottom: 1px solid #e1e7e0; }
 .header-inner { max-width: 780px; padding: 15px 20px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .brand { font-weight: 800; letter-spacing: -.025em; color: #173e2e; font-size: 1.18rem; }
+.header-inner { flex-wrap: wrap; }
+.profile-switcher { flex: 1 1 180px; min-width: 0; max-width: 100%; }
+.profile-switcher label { display: block; font-size: .81rem; font-weight: 700; margin-bottom: 4px; }
+@media (min-width: 580px) { .profile-switcher { flex: 0 1 260px; } }
 .main { max-width: 740px; margin: 0 auto; padding: 28px 16px 40px; min-height: calc(100vh - 140px); }
 .intro { margin-bottom: 24px; }
 .eyebrow { color: #44755b; font-weight: 750; font-size: .72rem; letter-spacing: .09em; margin: 0 0 8px; }
