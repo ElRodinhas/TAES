@@ -44,11 +44,16 @@ function limparMensagem() {
 }
 
 function showFallback(motivo) {
-    mostrarMensagem(`${motivo} Pode carregar uma foto do código ou preencher os dados manualmente.`);
-    mostrarFormulario(); // entrada manual sempre disponível
+    mostrarMensagem(`${motivo}`);
+    if ($id('camera-container')) $id('camera-container').style.display = 'none';
+    if ($id('fallback-container')) $id('fallback-container').style.display = 'block';
+    esconderFormulario();
 }
 
 function mostrarFormulario() {
+    if ($id('camera-container')) $id('camera-container').style.display = 'none';
+    if ($id('fallback-container')) $id('fallback-container').style.display = 'none';
+
     const formContainer = $id('formContainer');
     if (formContainer) {
         formContainer.style.display = 'block';
@@ -80,7 +85,7 @@ async function fecharScanner() {
 
 // ---------- Abrir / cancelar scanner ----------
 
-document.addEventListener('click', (event) => {
+document.addEventListener('click', async (event) => {
     const alvo = event.target;
     if (!alvo) return;
 
@@ -91,6 +96,11 @@ document.addEventListener('click', (event) => {
     if (alvo.id === 'restart-scanner-btn') {
         reiniciarScanner();
     }
+
+    if (alvo.id === 'btn-force-fallback') {
+        await pararCamara();
+        showFallback('Optou por usar as alternativas à câmara.');
+    }
 });
 
 // ---------- Câmara ----------
@@ -99,6 +109,9 @@ async function iniciarScanner() {
     aProcessar = false;
     esconderFormulario();
     limparMensagem();
+
+    if ($id('camera-container')) $id('camera-container').style.display = 'block';
+    if ($id('fallback-container')) $id('fallback-container').style.display = 'none';
 
     if (!bibliotecaDisponivel()) {
         showFallback('A biblioteca de leitura não foi carregada (sem ligação?).');
@@ -113,13 +126,52 @@ async function iniciarScanner() {
     await pararCamara();
 
     try {
+        const allCameras = await Html5Qrcode.getCameras();
+        if (!allCameras || allCameras.length === 0) throw new Error('Nenhuma câmara encontrada.');
 
-         const cameras = await Html5Qrcode.getCameras();
-        
-        if (!cameras || cameras.length === 0) {
-            throw new Error('Nenhuma câmara encontrada.');
+        // FILTRO: Remover a câmara frontal!
+        const rearCameras = allCameras.filter(cam => {
+            const label = (cam.label || '').toLowerCase();
+            // Se tiver estas palavras, é a frontal. Vamos ignorá-la.
+            if (label.includes('front') || label.includes('user') || label.includes('facetime')) {
+                return false;
+            }
+            return true;
+        });
+
+        const camerasToUse = rearCameras.length > 0 ? rearCameras : allCameras;
+
+        const cameraSelect = $id('camera-select');
+        const selectionContainer = $id('camera-selection-container');
+
+        // Preencher o seletor apenas com as câmaras traseiras
+        if (cameraSelect && selectionContainer) {
+            if (cameraSelect.options.length === 0) {
+                camerasToUse.forEach((cam, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = cam.id;
+                    opt.text = cam.label || `Câmara Traseira ${index + 1}`;
+                    cameraSelect.appendChild(opt);
+                });
+            }
+            // Mostra o seletor só se houver mais do que uma câmara traseira (para escolher a 1x)
+            if (camerasToUse.length > 1) {
+                selectionContainer.style.display = 'block';
+            } else {
+                selectionContainer.style.display = 'none';
+            }
         }
-        const cameraId = cameras[cameras.length - 1].id;
+
+        const savedCamId = localStorage.getItem('preferredCameraId');
+        let cameraId = savedCamId || (cameraSelect ? cameraSelect.value : cameras[0].id);
+
+        if (savedCamId && !camerasToUse.some(c => c.id === savedCamId)) {
+            cameraId = camerasToUse[0].id;
+        }
+
+        if (cameraSelect && savedCamId && camerasToUse.some(c => c.id === savedCamId)) {
+            cameraSelect.value = savedCamId;
+        }
 
         await leitor.start(
             cameraId,
@@ -144,11 +196,11 @@ async function reiniciarScanner() {
     esconderFormulario();
     const restartBtn = $id('restart-scanner-container');
     if (restartBtn) restartBtn.style.display = 'none';
-    
+
     limparMensagem();
     const form = $id('productForm');
     if (form) form.reset();
-    
+
     //Liga a câmara novamente
     await iniciarScanner();
 }
@@ -205,14 +257,14 @@ function verifyExpiryDate() {
     const dateInput = $id('productExpiry');
     if (dateInput) {
         const hoje = new Date();
-        
+
         // Mínimo: data atual
         const dataMinima = hoje.toISOString().split('T')[0];
-        
+
         // Máximo: data atual + 30 anos
         hoje.setFullYear(hoje.getFullYear() + 30);
         const dataMaxima = hoje.toISOString().split('T')[0];
-        
+
         dateInput.setAttribute('min', dataMinima);
         dateInput.setAttribute('max', dataMaxima);
     }
@@ -221,6 +273,14 @@ function verifyExpiryDate() {
 // ---------- Fallback: upload de imagem ----------
 
 document.addEventListener('change', async (event) => {
+    if (event.target.id === 'camera-select') {
+        const selectedCamId = event.target.value;
+        localStorage.setItem('preferredCameraId', selectedCamId); // Guarda a escolha
+        await pararCamara();
+        await iniciarScanner(); // Reinicia logo com a nova câmara
+        return; // Para não continuar para a lógica de upload
+    }
+    
     const input = event.target;
     if (!input || input.id !== 'barcodeFile' || !input.files || !input.files[0]) return;
 
@@ -330,9 +390,9 @@ window.saveProduct = function (event) {
         formMsg.textContent = 'Erro: O nome do produto é obrigatório.';
         formMsg.className = 'error';
         formMsg.hidden = false;
-        
-        limparMensagem(); 
-        return; 
+
+        limparMensagem();
+        return;
     }
 
     // Reject invalid barcode
@@ -369,30 +429,30 @@ window.saveProduct = function (event) {
         $id('barcodeVal').focus();
         return;
     }
-    
+
     // 2. Verificar se o produto já existe pelo nome (case-insensitive)
     const existingProductIndex = pantryInventory.findIndex(
         item => item.name.toLowerCase() === product.name.toLowerCase()
     );
 
     if (existingProductIndex !== -1) {
-        pantryInventory[existingProductIndex].quantity = 
+        pantryInventory[existingProductIndex].quantity =
             Number(pantryInventory[existingProductIndex].quantity) + Number(product.quantity);
-        if(product.expiry) {
-           pantryInventory[existingProductIndex].expiry = product.expiry;
+        if (product.expiry) {
+            pantryInventory[existingProductIndex].expiry = product.expiry;
         }
     } else {
         // Se não existe, adiciona como novo
         pantryInventory.push(product);
     }
-    
+
     // 3. Guardar no localStorage
     localStorage.setItem('smartPantry_inventory', JSON.stringify(pantryInventory));
 
     formMsg.textContent = `Sucesso! "${product.name}" guardado na despensa.`;
     formMsg.className = 'success';
     formMsg.hidden = false;
-    
+
     limparMensagem();
 
     const productForm = $id('productForm');
@@ -409,7 +469,7 @@ window.saveProduct = function (event) {
 document.addEventListener('DOMContentLoaded', () => {
 
     verifyExpiryDate();
-    
+
     // Se a secção do scanner existir nesta página, liga a câmara automaticamente
     if ($id('scanner-screen')) {
         iniciarScanner();

@@ -19,20 +19,54 @@
         </div>
     </header>
 
-    <main class="main">
-        <section id="scanner-screen" aria-labelledby="scanner-title" data-testid="scanner-screen">
-            <div class="intro">
-                <h1 id="scanner-title">SmartPantry - Scanner de Produtos</h1>
-                <p>Aponte a câmara para o código de barras ou insira os dados manualmente:</p>
-                <div id="reader"></div>
-                <div id="restart-scanner-container" style="margin-top: 15px; display: none; text-align: center;">
-                    <button type="button" id="restart-scanner-btn" class="button button-primary">Ler outro produto</button>
+    <div class="main">
+        <div id="scanner-screen">
+            <div id="camera-container">
+                <div class="intro">
+                    <h1 id="scanner-title">SmartPantry - Scanner de Produtos</h1>
+                    <p>Aponte a câmara para o código de barras ou insira os dados manualmente:</p>
+                    <div id="reader"></div>
+                    <div id="restart-scanner-container" style="margin-top: 15px; display: none; text-align: center;">
+                        <button type="button" id="restart-scanner-btn" class="button button-primary">Ler outro
+                            produto</button>
+
+                    </div>
+                </div>
+
+                <!-- Seletor de Câmara para resolver o problema da lente 0.5x -->
+                <div id="camera-selection-container"
+                    style="margin-top: 15px; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                    <label for="camera-select" style="font-size: 14px; font-weight: bold;">Se a imagem estiver desfocada
+                        (0.5x), mude a câmara:</label>
+                    <select id="camera-select"
+                        style="width: 100%; margin-top: 8px; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                       
+                    </select>
+                </div>
+
+                <button type="button" id="btn-force-fallback" class="button button-secondary"
+                    style="margin-top: 15px; width: 100%;">
+                    A câmara não funciona? Usar alternativas
+                </button>
+            </div>
+        </div>
+
+        <div id="fallback-container"
+            style="display: none; margin-top: 15px; background: #fff4e5; padding: 15px; border-radius: 8px;">
+
+            <p style="color: #d97706; font-weight: bold; margin-bottom: 15px;">
+                A câmara não está disponível. Use uma das seguintes opções:
+            </p>
+            <div class="field" style="margin-top: 15px;">
+                <h3>Opção 1: Upload de Imagem</h3>
+                <div class="field">
+                    <input type="file" id="barcodeFile" accept="image/*" capture="environment">
                 </div>
             </div>
 
             <div class="form-card" style="margin-top: 15px;">
+                <h3>Opção 2: Inserir Código Manual</h3>
                 <div class="field">
-                    <label for="manualBarcode">Ou digite o código de barras manualmente:</label>
                     <div style="display: flex; gap: 0.5rem;">
                         <input type="text" id="manualBarcode" data-testid="manual-barcode-input"
                             placeholder="Ex: 5601234567890" style="flex: 1;">
@@ -41,46 +75,42 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="field" style="margin-top: 15px;">
-                <label for="barcodeFile">Ou carregue uma foto do código de barras:</label>
-                <input type="file" id="barcodeFile" accept="image/*">
-            </div>
-            <p id="scanner-msg" role="alert" hidden></p>
+        <p id="scanner-msg" role="alert" hidden style="margin-top: 15px; font-weight: bold; color: #d97706;"></p>
 
-            <button type="button" id="cancel-scanner" class="button button-secondary"
-                style="margin-top: 15px;">Cancelar</button>
+        <div class="result-box" id="formContainer" style="display:none; margin-top: 15px;">
+            <h3>Validar Produto</h3>
+            <form id="productForm" onsubmit="saveProduct(event)">
+                <div class="field">
+                    <label>Código de Barras:</label>
+                    <input type="text" id="barcodeVal" data-testid="barcode-input">
+                </div>
+                <div class="field">
+                    <label>Nome do Produto:</label>
+                    <input type="text" id="productName" data-testid="input-item-name">
+                </div>
+                <div class="field">
+                    <label>Categoria:</label>
+                    <input type="text" id="productCategory" data-testid="input-item-category">
+                </div>
+                <div class="field">
+                    <label>Quantidade:</label>
+                    <input type="number" id="productQty" data-testid="input-item-qty" value="1" min="1">
+                </div>
+                <div class="field">
+                    <label>Data de Validade:</label>
+                    <input type="date" id="productExpiry" data-testid="input-item-expiry">
+                </div>
+                <button type="submit" id="btn-save-item" data-testid="btn-save-item" class="button button-primary"
+                    style="margin-bottom: 15px;">Guardar na Despensa</button>
 
-            <div class="result-box" id="formContainer" style="display:none; margin-top: 15px;">
-                <h3>Validar Produto</h3>
-                <form id="productForm" onsubmit="saveProduct(event)">
-                    <div class="field">
-                        <label>Código de Barras:</label>
-                        <input type="text" id="barcodeVal" data-testid="barcode-input">
-                    </div>
-                    <div class="field">
-                        <label>Nome do Produto:</label>
-                        <input type="text" id="productName" data-testid="input-item-name">
-                    </div>
-                    <div class="field">
-                        <label>Categoria:</label>
-                        <input type="text" id="productCategory" data-testid="input-item-category">
-                    </div>
-                    <div class="field">
-                        <label>Quantidade:</label>
-                        <input type="number" id="productQty" data-testid="input-item-qty" value="1" min="1">
-                    </div>
-                    <div class="field">
-                        <label>Data de Validade:</label>
-                        <input type="date" id="productExpiry" data-testid="input-item-expiry">
-                    </div>
-                    <button type="submit" id="btn-save-item" data-testid="btn-save-item"
-                        class="button button-primary" style="margin-bottom: 15px;">Guardar na Despensa</button>
-
-                    <p id="form-msg" role="alert" hidden></p>
-                </form>
-            </div>
-        </section>
+                <button type="button" id="cancel-scanner" class="button button-secondary"
+                    style="margin-top: 15px;">Cancelar</button>
+                <p id="form-msg" role="alert" hidden></p>
+            </form>
+        </div>
+    </div>
     </main>
 
     <!-- O scanner.js TEM de estar aqui -->
