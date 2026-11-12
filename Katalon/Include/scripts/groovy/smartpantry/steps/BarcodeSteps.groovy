@@ -127,7 +127,6 @@ class BarcodeSteps {
 			KeywordUtil.markFailedAndStop("O browser não redirecionou para o pantry.html a tempo.")
 		}
 		
-		// Verificação final
 		String currentUrl = WebUI.getUrl()
 		WebUI.verifyMatch(currentUrl, ".*pantry\\.html", true)
         def inventory = new JsonSlurper().parseText(readBarcodeInventory())

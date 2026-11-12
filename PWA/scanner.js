@@ -413,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Se a secção do scanner existir nesta página, liga a câmara automaticamente
     if ($id('scanner-screen')) {
         iniciarScanner();
+        verifyExpiryDate();
     }
 });
 
