@@ -19,6 +19,7 @@ import java.time.Duration
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import io.cucumber.java.After
+import com.kms.katalon.core.configuration.RunConfiguration
 
 class BarcodeSteps {
 	
@@ -37,6 +38,9 @@ class BarcodeSteps {
 
 	@Given("the user is on the scanner page")
 	def userIsOnScannerPage() {
+		
+		RunConfiguration.setWebDriverPreferencesProperty("args", ["--use-fake-ui-for-media-stream"])
+		
 		WebUI.openBrowser('')
 		WebUI.navigateToUrl(baseUrl)
 		WebUI.executeJavaScript("localStorage.removeItem('smartPantry_inventory');", null)
