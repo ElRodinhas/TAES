@@ -15,7 +15,7 @@ const pantry = [{ id: 'rice', name: 'Rice', quantity: 2, barcode: '0012345678905
 const seeded = () => new Map([[PROFILE_KEY, JSON.stringify(profiles)], [PANTRY_KEY, JSON.stringify(pantry)], ['unrelated', 'private value']]);
 
 function boot(storage = seeded(), options = {}) {
-  const elements = new Map(['export-data', 'export-error', 'export-status'].map((id) => [id, {
+  const elements = new Map(['export-data', 'export-error', 'export-status', 'import-data', 'import-file'].map((id) => [id, {
     hidden: true, textContent: '', addEventListener(type, handler) { this[type] = handler; }
   }]));
   const downloads = [], blobs = [], revoked = [], timers = [], links = [];

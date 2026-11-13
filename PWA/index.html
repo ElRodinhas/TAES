@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./styles.css" />
   <script src="./profiles.js" defer></script>
   <script src="./app.js" defer></script>
+  <script src="./barcode-validation.js" defer></script>
   <script src="./export.js" defer></script>
   <title>Smart Pantry</title> 
 </head>
@@ -135,14 +136,19 @@
     </section>
 
     <section aria-labelledby="export-title" class="form-card">
-      <h2 id="export-title">Export your data</h2>
+      <h2 id="export-title">Back up and restore your data</h2>
       <p>Save all profiles and pantry stock from this browser as a JSON file. No server is needed.</p>
       <p class="help-text">The file contains your personal data. Keep it somewhere safe.</p>
       <div class="form-actions">
         <button id="export-data" data-testid="export-data" type="button" class="button button-secondary">Export data (JSON)</button>
+        <button id="import-data" data-testid="import-data" type="button" class="button button-secondary">Import data (JSON)</button>
+        <input id="import-file" data-testid="import-file" type="file" accept=".json,application/json" aria-label="Choose a Smart Pantry backup" hidden />
       </div>
+      <p class="help-text">Import replaces your saved profiles and pantry stock after confirmation.</p>
       <p id="export-status" data-testid="export-status" role="status" class="help-text"></p>
       <p id="export-error" data-testid="export-error" role="alert" class="form-error" hidden></p>
+      <p id="import-status" data-testid="import-status" role="status" class="help-text"></p>
+      <p id="import-error" data-testid="import-error" role="alert" class="form-error" hidden></p>
     </section>
   </main>
   <footer class="footer"></footer>
