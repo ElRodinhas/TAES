@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./styles.css" />
   <script src="./profiles.js" defer></script>
   <script src="./app.js" defer></script>
+  <script src="./export.js" defer></script>
   <title>Smart Pantry</title> 
 </head>
 
@@ -133,6 +134,16 @@
       <p id="manager-error" data-testid="manager-error" role="alert" class="form-error" hidden></p>
     </section>
 
+    <section aria-labelledby="export-title" class="form-card">
+      <h2 id="export-title">Export your data</h2>
+      <p>Save all profiles and pantry stock from this browser as a JSON file. No server is needed.</p>
+      <p class="help-text">The file contains your personal data. Keep it somewhere safe.</p>
+      <div class="form-actions">
+        <button id="export-data" data-testid="export-data" type="button" class="button button-secondary">Export data (JSON)</button>
+      </div>
+      <p id="export-status" data-testid="export-status" role="status" class="help-text"></p>
+      <p id="export-error" data-testid="export-error" role="alert" class="form-error" hidden></p>
+    </section>
   </main>
   <footer class="footer"></footer>
 </body>
