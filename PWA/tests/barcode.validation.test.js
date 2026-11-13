@@ -5,7 +5,8 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
 
-const scannerSource = fs.readFileSync(path.join(__dirname, '..', 'scanner.js'), 'utf8');
+const scannerSource = fs.readFileSync(path.join(__dirname, '..', 'barcode-validation.js'), 'utf8') + '\n' +
+    fs.readFileSync(path.join(__dirname, '..', 'scanner.js'), 'utf8');
 
 function criarAmbiente(barcode = '') {
     const storage = new Map();
