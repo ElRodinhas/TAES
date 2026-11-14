@@ -12,7 +12,7 @@ const profiles = [
   { id: 'guests', name: 'Guests', servings: 2, lifestyle: 'vegan', allergies: ['Peanuts'], excludedIngredients: ['mushrooms'] }
 ];
 
-// Run the real app handlers with a minimal DOM, like the barcode validation tests.
+// Executa os handlers reais da aplicação com um DOM mínimo, tal como nos testes de validação de códigos de barras.
 function boot(storage = new Map(), failWrites = false, page = 'index.html') {
   function element() {
     return {
@@ -65,7 +65,7 @@ function seeded(households = profiles, activeHouseholdId = 'family') {
   ]);
 }
 
-test('header switching persists the active profile and preserves all other data', () => {
+test('US-02: alternar perfil no cabeçalho persiste o perfil ativo e preserva os restantes dados', () => {
   const storage = seeded();
   const before = new Map(storage);
   const app = boot(storage);
@@ -89,7 +89,7 @@ test('header switching persists the active profile and preserves all other data'
   assert.equal(storage.get(KEY), before.get(KEY));
 });
 
-test('failed storage writes restore selection and leave active profile and data unchanged', () => {
+test('US-02: falhas de escrita no armazenamento restauram a seleção e mantêm perfil ativo e dados inalterados', () => {
   const storage = seeded();
   const before = new Map(storage);
   const app = boot(storage, true);
@@ -101,7 +101,7 @@ test('failed storage writes restore selection and leave active profile and data 
   assert.deepEqual(storage, before);
 });
 
-test('an unknown profile cannot become active', () => {
+test('US-02: um perfil desconhecido não pode tornar-se ativo', () => {
   const app = boot(seeded());
   app.choose('missing');
   assert.equal(app.get('active-profile').value, 'family');
@@ -110,7 +110,7 @@ test('an unknown profile cannot become active', () => {
   assert.deepEqual(app.writes, []);
 });
 
-test('first launch hides the switcher and one saved profile is shown without a redundant write', () => {
+test('US-02: o primeiro arranque oculta o seletor e um perfil guardado é mostrado sem escrita redundante', () => {
   const firstLaunch = boot();
   assert.equal(firstLaunch.get('profile-switcher').hidden, true);
   assert.equal(firstLaunch.get('setup-screen').hidden, false);
@@ -120,7 +120,7 @@ test('first launch hides the switcher and one saved profile is shown without a r
   assert.deepEqual(app.writes, []);
 });
 
-test('management activation and deletion keep the header in sync', () => {
+test('US-02: ativação e eliminação na gestão mantêm o cabeçalho sincronizado', () => {
   const app = boot(seeded());
   function click(action, householdId) {
     app.get('household-list').listeners.click({
@@ -138,7 +138,7 @@ test('management activation and deletion keep the header in sync', () => {
 });
 
 for (const page of ['pantry.html', 'scan.html']) {
-  test(`${page}: switching persists across navigation without changing page contents or shared data`, () => {
+  test(`US-02 (${page}): alternar perfil persiste entre páginas sem alterar conteúdos nem dados partilhados`, () => {
     const storage = seeded();
     const before = new Map(storage);
     const app = boot(storage, false, page);
@@ -158,7 +158,7 @@ for (const page of ['pantry.html', 'scan.html']) {
     }
   });
 
-  test(`${page}: failed writes and missing profiles are handled safely`, () => {
+  test(`US-02 (${page}): falhas de escrita e perfis inexistentes são tratados com segurança`, () => {
     const storage = seeded();
     const before = new Map(storage);
     const app = boot(storage, true, page);
@@ -170,7 +170,7 @@ for (const page of ['pantry.html', 'scan.html']) {
   });
 }
 
-test('switching uses current saved preferences instead of overwriting newer changes', () => {
+test('US-02: alternar perfil usa as preferências guardadas atuais em vez de sobrescrever alterações recentes', () => {
   const app = boot(seeded(), false, 'pantry.html');
   const newer = JSON.parse(app.storage.get(KEY));
   newer.households[1].servings = 6;
