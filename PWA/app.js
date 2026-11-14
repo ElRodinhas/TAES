@@ -132,6 +132,7 @@
   function createButton(label, action, householdId, testId, style = 'button-secondary') {
     const button = document.createElement('button');
     button.type = 'button';
+    button.id = `${testId}-${householdId}`;
     button.className = `button button-small ${style}`;
     button.textContent = label;
     button.dataset.action = action;
@@ -175,9 +176,13 @@
 
     const actions = document.createElement('div');
     actions.className = 'household-actions';
-    if (!active) actions.appendChild(createButton('Set active', 'activate', household.id, 'activate-household'));
+    if (!active) {
+      actions.appendChild(createButton('Set active', 'activate', household.id, 'activate-household'));
+    }
     actions.appendChild(createButton('Edit', 'edit', household.id, 'edit-household'));
-    actions.appendChild(createButton('Delete', 'delete', household.id, 'delete-household', 'button-danger'));
+    if (!active) {
+      actions.appendChild(createButton('Delete', 'delete', household.id, 'delete-household', 'button-danger'));
+    }
     card.appendChild(actions);
 
     if (pendingDeleteId === household.id) {
@@ -277,6 +282,10 @@
     if (action === 'edit') {
       startForm('edit', household);
     } else if (action === 'delete') {
+      if (household.id === state.activeHouseholdId) {
+        showError('manager-error', 'Cannot delete the active profile.');
+        return;
+      }
       pendingDeleteId = household.id;
       renderHouseholds();
     } else if (action === 'cancel-delete') {
@@ -285,6 +294,10 @@
     } else if (action === 'activate') {
       activateHousehold(household.id, 'manager-error');
     } else if (action === 'confirm-delete') {
+      if (household.id === state.activeHouseholdId) {
+        showError('manager-error', 'Cannot delete the active profile.');
+        return;
+      }
       const next = {
         version: 1,
         households: state.households.filter((h) => h.id !== household.id),
