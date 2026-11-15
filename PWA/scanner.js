@@ -303,7 +303,7 @@ document.addEventListener('change', async (event) => {
         onScanSuccess(codigo);
     } catch (err) {
         console.error('Erro ao ler a imagem:', err);
-        showFallback('Não foi possível ler o código na imagem.');
+        showFallback('Não foi possível ler o código. Tente tirar uma foto mais nítida, direita e apenas ao código de barras, ou insira o código manualmente abaixo.');
         mostrarFormulario(); // entrada manual
     }
 });
@@ -473,7 +473,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Se a secção do scanner existir nesta página, liga a câmara automaticamente
     if ($id('scanner-screen')) {
         iniciarScanner();
-        verifyExpiryDate();
     }
 });
 
