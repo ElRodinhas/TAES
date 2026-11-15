@@ -9,7 +9,7 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.When
 import io.cucumber.java.en.Then
 
-/** Browser acceptance tests stub only the recipe endpoint; real API evidence is demo/spike.py. */
+/** Browser tests stub the recipe endpoint; live API checks are in PWA/tests/recipe-api.spike.js. */
 class GenerateRecipesSteps {
     private TestObject byId(String id) {
         TestObject object = new TestObject(id)

@@ -90,9 +90,9 @@ Thumbs.db
 *.log
 *.tmp
 
-# Local recipe demo credentials and experiment output
+# Local server credentials and experiment output
 .env
 .env.*
 !.env.example
 __pycache__/
-demo/evidence/
+.recipe-spike-evidence-*.json

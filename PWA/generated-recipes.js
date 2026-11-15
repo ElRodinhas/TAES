@@ -1,4 +1,4 @@
-/* US-15: local-first recipe generation. Gemini credentials stay in demo/server.py. */
+/* US-15: local-first recipe generation through server.js; credentials stay outside PWA/. */
 (() => {
   'use strict';
   const STORAGE_KEY = 'smartPantry.generatedRecipes.v1';
