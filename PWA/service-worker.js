@@ -1,9 +1,10 @@
 /* Caches only the app shell; household data remains in localStorage. */
-const CACHE_NAME = 'smart-pantry-shell-v3';
+const CACHE_NAME = 'smart-pantry-shell-v4';
 const APP_FILES = [
   './', './index.html', './styles.css', './app.js', './profiles.js', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png',
-  './scan.html', './scanner.js', './pantry.html', './pantry.js'
+  './scan.html', './scanner.js', './pantry.html', './pantry.js',
+  './recipes.html', './recipes.js', './generated-recipes.js', './date-utils.js'
 ];
 
 self.addEventListener('install', (event) => {
