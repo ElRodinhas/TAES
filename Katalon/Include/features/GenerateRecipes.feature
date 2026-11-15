@@ -7,6 +7,10 @@ Feature: Generate and save recipes from leftovers
   Background:
     Given the generator has an active vegan profile for 2 portions and pantry tomatoes
 
+  Scenario: Offer catalogue search before AI generation
+    When I reload the recipe discovery page
+    Then the catalogue search appears before AI generation
+
   Scenario: Combine pantry and manual ingredients using the active profile
     Given the recipe service returns a structured recipe
     When I select pantry tomatoes and enter leftover rice

@@ -32,7 +32,7 @@ h2 { line-height: 1.3; }
 #generation-pantry input { width: 20px; height: 20px; vertical-align: middle; }
 #leftover-list li { margin-bottom: 8px; overflow-wrap: anywhere; }
 #generated-recipe, #saved-recipes { overflow-wrap: anywhere; }
-#saved-title, #recipes-screen { margin-top: 28px; }
+#saved-title, #generation-screen { margin-top: 28px; }
 #generate-form button:disabled, #allow-missing:disabled { cursor: wait; opacity: .65; }
 .field { margin-bottom: 23px; }
 .last-field { margin-bottom: 0; }

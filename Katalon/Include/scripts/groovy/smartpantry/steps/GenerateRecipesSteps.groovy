@@ -66,6 +66,19 @@ class GenerateRecipesSteps {
     @Given('the recipe service returns a structured recipe')
     void structuredService() { mockService('ready') }
 
+    @When('I reload the recipe discovery page')
+    void reloadRecipeDiscovery() { WebUI.refresh() }
+
+    @Then('the catalogue search appears before AI generation')
+    void verifyDiscoveryOrder() {
+        WebUI.verifyEqual(WebUI.executeJavaScript('''
+            const catalogue = document.getElementById('recipes-screen');
+            const generator = document.getElementById('generation-screen');
+            return Boolean(catalogue && generator &&
+                (catalogue.compareDocumentPosition(generator) & Node.DOCUMENT_POSITION_FOLLOWING));
+        ''', null), true)
+    }
+
     @Given('the recipe service cannot use only the supplied ingredients')
     void noRecipeService() { mockService('missing') }
 

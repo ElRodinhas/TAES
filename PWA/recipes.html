@@ -27,8 +27,33 @@
     </header>
 
     <main class="main">
-        <section class="form-card" aria-labelledby="generate-title">
-            <h1 id="generate-title">Gerar uma receita com sobras</h1>
+        <section id="recipes-screen" aria-labelledby="recipes-title">
+            <div class="intro">
+                <h1 id="recipes-title">O que posso cozinhar?</h1>
+                <p>Receitas sugeridas com base no stock atual da tua despensa. Os produtos quase a expirar aparecem primeiro.</p>
+            </div>
+
+            <div class="form-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <p style="margin: 0;"><strong>Receitas encontradas:</strong> <span id="recipe-count">0</span></p>
+                <button id="btn-fetch-recipes" class="button button-primary" type="button">Procurar Receitas 🔍</button>
+            </div>
+
+            <!-- Mensagem de erro/sucesso -->
+            <p id="recipe-msg" role="alert" hidden></p>
+
+            <!-- Loading Spinner -->
+            <div id="loading-recipes" style="display: none; text-align: center; padding: 20px;">
+                <p>A procurar as melhores receitas para ti...</p>
+            </div>
+
+
+            <div id="recipes-list" class="household-list" style="margin-top: 20px;">
+                <!-- Aqui serão inseridas as receitas encontradas -->
+
+            </div>
+        </section>
+        <section id="generation-screen" class="form-card" aria-labelledby="generate-title">
+            <h2 id="generate-title">Gerar uma receita com sobras</h2>
             <p>Escolhe ingredientes da despensa e/ou acrescenta sobras. A receita pode usar apenas alguns deles.</p>
             <p id="generation-profile"></p>
             <form id="generate-form" data-testid="generate-form" aria-busy="false">
@@ -60,31 +85,7 @@
             <p>Disponíveis mesmo sem ligação à Internet. As receitas são partilhadas entre os perfis; verifica se são adequadas ao perfil atual.</p>
             <div id="saved-recipes" data-testid="saved-recipes" class="household-list"></div>
         </section>
-        <section id="recipes-screen" aria-labelledby="recipes-title">
-            <div class="intro">
-                <h1 id="recipes-title">O que posso cozinhar?</h1>
-                <p>Receitas sugeridas com base no stock atual da tua despensa. Os produtos quase a expirar aparecem primeiro.</p>
-            </div>
 
-            <div class="form-card" style="display: flex; justify-content: space-between; align-items: center;">
-                <p style="margin: 0;"><strong>Receitas encontradas:</strong> <span id="recipe-count">0</span></p>
-                <button id="btn-fetch-recipes" class="button button-primary" type="button">Procurar Receitas 🔍</button>
-            </div>
-
-            <!-- Mensagem de erro/sucesso -->
-            <p id="recipe-msg" role="alert" hidden></p>
-
-            <!-- Loading Spinner -->
-            <div id="loading-recipes" style="display: none; text-align: center; padding: 20px;">
-                <p>A procurar as melhores receitas para ti...</p>
-            </div>
-
-           
-            <div id="recipes-list" class="household-list" style="margin-top: 20px;">
-                <!-- Aqui serão inseridas as receitas encontradas -->
-                
-            </div>
-        </section>
     </main>
 
     <script src="./profiles.js"></script>
