@@ -1,7 +1,7 @@
 /* US-15: local-first recipe generation through server.js; credentials stay outside PWA/. */
 (() => {
   'use strict';
-  const STORAGE_KEY = 'smartPantry.generatedRecipes.v1';
+  const { isRecipe, saveRecipe, recipeDetails } = window.SmartPantryRecipeBook;
   const $ = (id) => document.getElementById(id);
   const leftovers = [];
   let busy = false;
@@ -101,52 +101,22 @@
     if (!ingredients.length || ingredients.length > 40 || !Number.isInteger(servings) || servings < 1 || servings > 30) throw new Error('INPUT');
     return { ingredients, servings, lifestyle: active.lifestyle, allergies: [...active.allergies], excludedIngredients: [...active.excludedIngredients], allowMissing: false };
   }
-  function isRecipe(recipe) {
-    return recipe && typeof recipe.title === 'string' && Number.isInteger(recipe.servings) && recipe.servings >= 1 && recipe.servings <= 30 &&
-      ['prepMinutes', 'cookMinutes', 'totalMinutes'].every((key) => Number.isInteger(recipe[key]) && recipe[key] >= 0) && recipe.totalMinutes > 0 &&
-      Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0 && recipe.ingredients.every((item) =>
-        item && typeof item.name === 'string' && typeof item.quantity === 'number' && Number.isFinite(item.quantity) && item.quantity > 0 && typeof item.unit === 'string' && (item.sourceIndex === null || Number.isInteger(item.sourceIndex))) &&
-      Array.isArray(recipe.steps) && recipe.steps.length > 0 && recipe.steps.every((step) => typeof step === 'string' && step.trim());
-  }
-  function readSaved() {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    if (!Array.isArray(stored) || !stored.every(isRecipe)) throw new Error('STORAGE');
-    return stored;
-  }
-  function recipeCard(recipe, canSave) {
+  function recipeCard(recipe) {
     const card = element('article');
     card.className = 'household-card';
-    card.append(element('h3', recipe.title), element('p', `${recipe.servings} porções · Preparação: ${recipe.prepMinutes} min · Cozedura: ${recipe.cookMinutes} min · Total: ${recipe.totalMinutes} min`));
-    const ingredients = element('ul');
-    recipe.ingredients.forEach((item) => ingredients.append(element('li', `${item.quantity.toLocaleString('pt-PT')} ${item.unit} de ${item.name}${item.sourceIndex === null ? ' — Em falta' : ''}`)));
-    const steps = element('ol');
-    recipe.steps.forEach((step) => steps.append(element('li', step)));
-    card.append(element('h4', 'Ingredientes'), ingredients, element('h4', 'Preparação'), steps);
-    card.append(element('p', 'Receita gerada por IA. Confirma os ingredientes e rótulos, sobretudo em caso de alergia.'));
-    if (canSave) {
-      const save = element('button', 'Guardar receita');
-      save.type = 'button';
-      save.className = 'button button-secondary';
-      save.dataset.testid = 'save-generated-recipe';
-      save.addEventListener('click', () => {
-        try {
-          const saved = readSaved();
-          if (!saved.some((item) => JSON.stringify(item) === JSON.stringify(recipe))) saved.push(recipe);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
-          renderSaved();
-          message('Receita guardada neste dispositivo.');
-        } catch { message(errors.STORAGE); }
-      });
-      card.append(save);
-    }
+    card.append(element('h3', recipe.title), recipeDetails(recipe, 'h4'));
+    const save = element('button', 'Guardar receita');
+    save.type = 'button';
+    save.className = 'button button-secondary';
+    save.dataset.testid = 'save-generated-recipe';
+    save.addEventListener('click', () => {
+      try {
+        saveRecipe(recipe);
+        message('Receita guardada. Abre Receitas Guardadas para a consultar.');
+      } catch { message(errors.STORAGE); }
+    });
+    card.append(save);
     return card;
-  }
-  function renderSaved() {
-    try {
-      const saved = readSaved();
-      $('saved-recipes').replaceChildren(...saved.map((recipe) => recipeCard(recipe, false)));
-      if (!saved.length) $('saved-recipes').append(element('p', 'Ainda não guardaste receitas.'));
-    } catch { $('saved-recipes').replaceChildren(element('p', 'Não foi possível ler as receitas guardadas neste dispositivo.')); }
   }
   async function generate(request) {
     if (busy) return;
@@ -181,7 +151,7 @@
           message('Não foi encontrada uma proposta só com os ingredientes indicados.');
         } else message('Não foi possível propor uma receita adequada. Experimenta outros ingredientes.');
       } else if (result.status === 'ready' && isRecipe(result.recipe) && result.recipe.servings === request.servings) {
-        $('generated-recipe').replaceChildren(recipeCard(result.recipe, true));
+        $('generated-recipe').replaceChildren(recipeCard(result.recipe));
         message('Receita gerada. As quantidades indicam o necessário para as porções pedidas.');
       } else throw new Error('INVALID_RECIPE');
     } catch (error) {
@@ -214,10 +184,8 @@
       $('generated-recipe').replaceChildren();
     }
     if (event.key === 'smartPantry_inventory' || event.key === null) { renderPantry(); clearConsent(); }
-    if (event.key === STORAGE_KEY || event.key === null) renderSaved();
   });
   renderPantry();
   syncProfile();
-  renderSaved();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js').catch(() => {});
 })();

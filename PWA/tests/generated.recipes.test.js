@@ -4,16 +4,17 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const source = fs.readFileSync(path.join(__dirname, '..', 'generated-recipes.js'), 'utf8');
+const bookSource = fs.readFileSync(path.join(__dirname, '..', 'recipe-book.js'), 'utf8');
 const SAVED = 'smartPantry.generatedRecipes.v1';
 const recipe = { title: 'Arroz de tomate', servings: 3, prepMinutes: 5, cookMinutes: 10, totalMinutes: 15,
   ingredients: [{ name: 'tomate', quantity: 100, unit: 'g', sourceIndex: 0 }], steps: ['Corta o tomate.', 'Junta o arroz.'] };
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
 // Exercise real event handlers with the same minimal DOM approach as the profile tests.
-function boot({ storage = new Map(), reply = () => ({ status: 'ready', recipe }), online = true, household = true, failWrites = false } = {}) {
+function boot({ storage = new Map(), reply = () => ({ status: 'ready', recipe }), online = true, household = true, failWrites = false, failReads = false, page = 'discovery' } = {}) {
   function element(tag = '') {
     return {
-      tag, value: '', hidden: false, disabled: false, checked: false, textContent: '', dataset: {}, children: [], listeners: {}, style: {}, attributes: {},
+      tag, open: false, value: '', hidden: false, disabled: false, checked: false, textContent: '', dataset: {}, children: [], listeners: {}, style: {}, attributes: {},
       append(...children) { this.children.push(...children); },
       replaceChildren(...children) { this.children = children; },
       addEventListener(type, handler) { this.listeners[type] = handler; },
@@ -27,15 +28,20 @@ function boot({ storage = new Map(), reply = () => ({ status: 'ready', recipe })
     };
   }
   const fields = new Map();
-  const get = (id) => { if (!fields.has(id)) fields.set(id, element()); return fields.get(id); };
+  const get = (id) => {
+    if (page === 'discovery' && ['saved-recipes', 'saved-search', 'saved-status'].includes(id)) return null;
+    if (page === 'saved' && id === 'saved-recipes-link') return null;
+    if (!fields.has(id)) fields.set(id, element());
+    return fields.get(id);
+  };
   const active = household ? { id: 'home', name: 'Casa', servings: 2, lifestyle: 'vegan', allergies: ['Peanuts'], excludedIngredients: ['cogumelos'] } : null;
   const calls = [];
   const windowListeners = {};
-  const localStorage = { getItem: (key) => storage.get(key) ?? null, setItem(key, value) { if (failWrites) throw new Error('full'); storage.set(key, value); } };
+  const localStorage = { getItem: (key) => { if (failReads) throw new Error('unavailable'); return storage.get(key) ?? null; }, setItem(key, value) { if (failWrites) throw new Error('full'); storage.set(key, value); } };
   const context = vm.createContext({
     document: { getElementById: get, createElement: element, createTextNode: (text) => Object.assign(element(), { textContent: text }) },
     window: { SmartPantryProfiles: { readStoredState: () => ({ households: active ? [active] : [], activeHouseholdId: active?.id }), renderSwitcher() {} },
-      addEventListener: (type, handler) => { windowListeners[type] = handler; } },
+      addEventListener: (type, handler) => { const previous = windowListeners[type]; windowListeners[type] = (event) => { previous?.(event); handler(event); }; } },
     localStorage, navigator: { onLine: online }, AbortController, setTimeout, clearTimeout,
     fetch: async (url, options) => {
       const data = JSON.parse(options.body);
@@ -44,7 +50,8 @@ function boot({ storage = new Map(), reply = () => ({ status: 'ready', recipe })
       return { ok: !result.error, json: async () => result };
     }
   });
-  vm.runInContext(source, context);
+  vm.runInContext(bookSource, context);
+  if (page === 'discovery') vm.runInContext(source, context);
   const app = {
     get, storage, calls, active, windowListeners,
     click(id) { get(id).listeners.click(); },
@@ -93,7 +100,7 @@ test('saved recipes survive reload offline without API requests or changing shar
   const card = app.get('generated-recipe').children[0];
   card.children.find((child) => child.dataset.testid === 'save-generated-recipe').listeners.click();
   assert.equal(JSON.parse(app.storage.get(SAVED)).length, 1);
-  const reloaded = boot({ storage: app.storage, online: false });
+  const reloaded = boot({ storage: app.storage, online: false, page: 'saved' });
   assert.match(reloaded.text(reloaded.get('saved-recipes')), /Arroz de tomate/);
   assert.equal(reloaded.calls.length, 0);
   assert.deepEqual([...app.storage.keys()], [SAVED]);
@@ -144,4 +151,91 @@ test('generated text is rendered as text, and a profile change invalidates an in
   await tick();
   assert.equal(app.get('generated-recipe').children.length, 0);
   assert.match(app.get('generation-message').textContent, /perfil válido/);
+});
+
+test('discovery shows a saved-recipe count, updated after saving without rendering the collection', async () => {
+  const app = boot();
+  assert.equal(app.get('saved-recipes-link').textContent, 'Receitas Guardadas (0)');
+  app.add();
+  await app.submit();
+  const save = app.get('generated-recipe').children[0].children.find((child) => child.dataset.testid === 'save-generated-recipe');
+  save.listeners.click();
+  assert.equal(app.get('saved-recipes-link').textContent, 'Receitas Guardadas (1)');
+  save.listeners.click();
+  assert.equal(JSON.parse(app.storage.get(SAVED)).length, 1);
+  assert.equal(app.get('saved-recipes'), null);
+});
+
+test('existing saved recipes open as collapsed cards with portions and total time, without storage changes', () => {
+  const storage = new Map([[SAVED, JSON.stringify([recipe, { ...recipe, title: 'Sopa de legumes' }])], ['smartPantry_inventory', '[]']]);
+  const before = new Map(storage);
+  const app = boot({ storage, page: 'saved', online: false, household: false });
+  const cards = app.get('saved-recipes').children;
+  assert.equal(cards.length, 2);
+  for (const card of cards) {
+    assert.equal(card.tag, 'details');
+    assert.equal(card.open, false);
+    assert.equal(card.children[0].tag, 'summary');
+    assert.match(app.text(card.children[0]), /3 porções · 15 min/);
+    assert.match(app.text(card.children[1]), /100 g de tomate/);
+    assert.ok(card.children[1].children.some((child) => child.tag === 'ol'));
+  }
+  assert.deepEqual(storage, before);
+  assert.equal(app.calls.length, 0);
+});
+
+test('saved title search ignores case and accents and distinguishes empty and no-match states', () => {
+  const storage = new Map([[SAVED, JSON.stringify([recipe, { ...recipe, title: 'Grão com legumes' }])]]);
+  const app = boot({ storage, page: 'saved' });
+  app.get('saved-search').value = ' GRAO ';
+  app.get('saved-search').listeners.input();
+  assert.equal(app.get('saved-recipes').children.length, 1);
+  assert.match(app.text(app.get('saved-recipes')), /Grão com legumes/);
+  assert.equal(app.get('saved-status').textContent, '1 de 2 receitas');
+  app.get('saved-search').value = 'inexistente';
+  app.get('saved-search').listeners.input();
+  assert.match(app.text(app.get('saved-recipes')), /Não foram encontradas/);
+  app.get('saved-search').value = '';
+  app.get('saved-search').listeners.input();
+  assert.equal(app.get('saved-recipes').children.length, 2);
+  const empty = boot({ page: 'saved' });
+  assert.match(empty.text(empty.get('saved-recipes')), /Ainda não guardaste/);
+});
+
+test('saved page reports malformed or inaccessible storage without overwriting it', () => {
+  for (const raw of ['{', '{}', '[{"title":"Incomplete"}]']) {
+    const storage = new Map([[SAVED, raw]]);
+    const app = boot({ storage, page: 'saved' });
+    assert.match(app.get('saved-status').textContent, /Não foi possível ler/);
+    assert.equal(storage.get(SAVED), raw);
+    assert.equal(app.get('saved-recipes').children.length, 0);
+  }
+  const app = boot({ page: 'saved', failReads: true });
+  assert.match(app.get('saved-status').textContent, /Não foi possível ler/);
+});
+
+test('saved page and discovery count refresh on changes from another tab', () => {
+  const storage = new Map();
+  const saved = boot({ storage, page: 'saved' });
+  const discovery = boot({ storage });
+  storage.set(SAVED, JSON.stringify([recipe]));
+  saved.windowListeners.storage({ key: SAVED });
+  discovery.windowListeners.storage({ key: SAVED });
+  assert.match(saved.text(saved.get('saved-recipes')), /Arroz de tomate/);
+  assert.equal(discovery.get('saved-recipes-link').textContent, 'Receitas Guardadas (1)');
+  storage.delete(SAVED);
+  saved.windowListeners.storage({ key: null });
+  discovery.windowListeners.storage({ key: null });
+  assert.match(saved.text(saved.get('saved-recipes')), /Ainda não guardaste/);
+  assert.equal(discovery.get('saved-recipes-link').textContent, 'Receitas Guardadas (0)');
+});
+
+test('saved titles and instructions remain literal text', () => {
+  const title = '<img src=x onerror=alert(1)>';
+  const storage = new Map([[SAVED, JSON.stringify([{ ...recipe, title, steps: ['<script>alert(1)</script>'] }])]]);
+  const app = boot({ storage, page: 'saved' });
+  const card = app.get('saved-recipes').children[0];
+  assert.equal(card.children[0].children[0].textContent, title);
+  assert.equal(card.children[0].children[0].children.length, 0);
+  assert.match(app.text(card), /<script>alert\(1\)<\/script>/);
 });

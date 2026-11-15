@@ -32,7 +32,15 @@ h2 { line-height: 1.3; }
 #generation-pantry input { width: 20px; height: 20px; vertical-align: middle; }
 #leftover-list li { margin-bottom: 8px; overflow-wrap: anywhere; }
 #generated-recipe, #saved-recipes { overflow-wrap: anywhere; }
-#saved-title, #generation-screen { margin-top: 28px; }
+#generation-screen { margin-top: 28px; }
+.recipe-nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.recipe-nav a { text-decoration: none; }
+.saved-recipe { padding: 0; }
+.saved-recipe summary { padding: 16px; cursor: pointer; min-height: 46px; overflow-wrap: anywhere; }
+.saved-recipe summary h2 { display: inline; font-size: 1rem; }
+.saved-recipe summary p { margin: 6px 0 0; }
+.saved-recipe summary:focus-visible { outline: 3px solid #7aaa90; outline-offset: 2px; border-radius: 10px; }
+.saved-recipe .recipe-details { padding: 0 16px 16px; }
 #generate-form button:disabled, #allow-missing:disabled { cursor: wait; opacity: .65; }
 .field { margin-bottom: 23px; }
 .last-field { margin-bottom: 0; }

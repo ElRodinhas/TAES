@@ -18,7 +18,27 @@ Feature: Generate and save recipes from leftovers
     Then the generation request includes both ingredients and the profile restrictions
     And a Portuguese recipe shows times, 3 portions, measurements and numbered steps
     When I save the generated recipe and reload
+    And I open the saved recipes page
     Then the saved recipe is still available without contacting the recipe service
+
+  Scenario: Browse saved recipes as compact cards and search by title
+    Given the device has several saved recipes
+    When I open the saved recipes page
+    Then saved recipe details are collapsed initially
+    When I search saved recipes for "arroz"
+    Then only the saved recipe "Arroz de tomate" is listed
+    When I expand the saved recipe
+    Then the saved ingredients and numbered instructions are visible
+
+  Scenario: Saved recipes have an empty state
+    When I open the saved recipes page
+    Then an empty saved recipes message is visible
+
+  Scenario: Search without matching saved recipes
+    Given the device has several saved recipes
+    When I open the saved recipes page
+    And I search saved recipes for "inexistente"
+    Then a no matching saved recipes message is visible
 
   Scenario: Ask permission before allowing missing ingredients
     Given the recipe service cannot use only the supplied ingredients

@@ -135,16 +135,73 @@ class GenerateRecipesSteps {
     void saveAndReload() {
         saveRecipe()
         WebUI.refresh()
-        WebUI.executeJavaScript('''
-            window.__generationCalls = [];
-            window.fetch = async () => { window.__generationCalls.push('unexpected'); throw new Error('offline'); };
-        ''', null)
+        WebUI.verifyEqual(WebUI.getText(byId('saved-recipes-link')), 'Receitas Guardadas (1)')
+        WebUI.verifyEqual(WebUI.executeJavaScript("return document.getElementById('saved-recipes') === null", null), true)
+    }
+
+    @When('I open the saved recipes page')
+    void openSavedPage() {
+        WebUI.click(byId('saved-recipes-link'))
+        WebUI.waitForElementVisible(byId('saved-search'), 10)
     }
 
     @Then('the saved recipe is still available without contacting the recipe service')
     void verifySaved() {
         WebUI.verifyEqual(WebUI.getText(byId('saved-recipes')).contains('Arroz de tomate'), true)
-        WebUI.verifyEqual(WebUI.executeJavaScript('return window.__generationCalls.length', null), 0)
+        WebUI.verifyEqual(WebUI.executeJavaScript('''
+            return performance.getEntriesByType('resource').filter(entry =>
+                new URL(entry.name).pathname.includes('/api/generate-recipe')).length;
+        ''', null), 0)
+    }
+
+    @Given('the device has several saved recipes')
+    void seedSavedRecipes() {
+        WebUI.executeJavaScript('''
+            const recipe = {servings:2,prepMinutes:5,cookMinutes:10,totalMinutes:15,
+                ingredients:[{name:'tomate',quantity:200,unit:'g',sourceIndex:0}],
+                steps:['Corta o tomate.','Aquece e serve.']};
+            localStorage.setItem('smartPantry.generatedRecipes.v1', JSON.stringify(
+                ['Arroz de tomate','Sopa de legumes','Grão com legumes'].map(title => ({...recipe,title}))));
+        ''', null)
+        WebUI.refresh()
+    }
+
+    @Then('saved recipe details are collapsed initially')
+    void verifyCompactCards() {
+        WebUI.verifyEqual(WebUI.executeJavaScript('''
+            const cards = [...document.querySelectorAll('[data-testid="saved-recipe"]')];
+            return cards.length === 3 && cards.every(card => card.tagName === 'DETAILS' && !card.open);
+        ''', null), true)
+        WebUI.verifyElementNotVisible(byId('saved-recipe-details'))
+    }
+
+    @When('I search saved recipes for {string}')
+    void searchSavedRecipes(String query) { WebUI.setText(byId('saved-search'), query) }
+
+    @Then('only the saved recipe {string} is listed')
+    void verifySearch(String title) {
+        WebUI.verifyEqual(WebUI.executeJavaScript("return document.querySelectorAll('[data-testid=\"saved-recipe\"]').length", null), 1)
+        WebUI.verifyEqual(WebUI.getText(byId('saved-recipe-summary')).contains(title), true)
+    }
+
+    @When('I expand the saved recipe')
+    void expandSavedRecipe() { WebUI.click(byId('saved-recipe-summary')) }
+
+    @Then('the saved ingredients and numbered instructions are visible')
+    void verifyExpandedRecipe() {
+        WebUI.verifyElementVisible(byId('saved-recipe-details'))
+        WebUI.verifyEqual(WebUI.getText(byId('saved-recipe-details')).contains('200 g de tomate'), true)
+        WebUI.verifyEqual(WebUI.executeJavaScript("return document.querySelectorAll('#saved-recipes ol li').length", null), 2)
+    }
+
+    @Then('an empty saved recipes message is visible')
+    void verifySavedEmpty() {
+        WebUI.verifyEqual(WebUI.getText(byId('saved-recipes')).contains('Ainda não guardaste receitas'), true)
+    }
+
+    @Then('a no matching saved recipes message is visible')
+    void verifyNoSavedMatches() {
+        WebUI.verifyEqual(WebUI.getText(byId('saved-recipes')).contains('Não foram encontradas receitas'), true)
     }
 
     @Then('the generator asks permission to suggest missing ingredients')

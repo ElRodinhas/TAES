@@ -20,8 +20,9 @@
                 <select id="active-profile" data-testid="active-profile" aria-describedby="profile-switch-error"></select>
                 <p id="profile-switch-error" role="alert" hidden></p>
             </div>
-            <nav>
+            <nav class="recipe-nav" aria-label="Navegação de receitas">
                 <a href="./pantry.html" class="button button-secondary" style="text-decoration: none;">Voltar à Despensa</a>
+                <a id="saved-recipes-link" data-testid="saved-recipes-link" href="./saved-recipes.html" class="button button-secondary">Receitas Guardadas</a>
             </nav>
         </div>
     </header>
@@ -80,15 +81,11 @@
             </div>
             <div id="generated-recipe" data-testid="generated-recipe"></div>
         </section>
-        <section aria-labelledby="saved-title">
-            <h2 id="saved-title">Receitas guardadas neste dispositivo</h2>
-            <p>Disponíveis mesmo sem ligação à Internet. As receitas são partilhadas entre os perfis; verifica se são adequadas ao perfil atual.</p>
-            <div id="saved-recipes" data-testid="saved-recipes" class="household-list"></div>
-        </section>
 
     </main>
 
     <script src="./profiles.js"></script>
+    <script src="./recipe-book.js"></script>
     <script src="./generated-recipes.js"></script>
     <script src="./date-utils.js"></script>
     <script src="./recipes.js"></script>
