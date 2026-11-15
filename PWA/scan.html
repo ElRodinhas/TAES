@@ -8,6 +8,7 @@
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" type="image/png" href="./icons/icon-192.png">
     <link rel="stylesheet" href="./styles.css">
+    <script src="./profiles.js" defer></script>
     <title>Smart Pantry - Scanner</title>
     <script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
 </head>
@@ -16,6 +17,11 @@
     <header class="site-header">
         <div class="header-inner">
             <div class="brand" aria-label="Smart Pantry">Smart Pantry</div>
+            <div id="profile-switcher" class="profile-switcher" data-testid="profile-switcher" hidden>
+              <label for="active-profile">Active profile</label>
+              <select id="active-profile" data-testid="active-profile" aria-describedby="profile-switch-error"></select>
+              <p id="profile-switch-error" data-testid="profile-switch-error" class="field-error" role="alert" hidden></p>
+            </div>
         </div>
     </header>
 

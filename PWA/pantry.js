@@ -9,11 +9,18 @@ function renderPantry() {
 
     let htmlContent = '';
     inventory.forEach(item => {
+        const estado = obterEstadoValidade(item.expiry); 
+        if (estado === 'expirado') {
+            alertaHtml = `<p style="background-color: #ffebee; color: #c62828; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; margin: 5px 0;"><strong>❌ Expirado!</strong></p>`;
+        } else if (estado === 'quase') {
+            alertaHtml = `<p style="background-color: #fff3cd; color: #856404; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; margin: 5px 0;"><strong>⚠️ Expira em breve!</strong></p>`;
+        }
+
         htmlContent += `
             <div class="form-card pantry-item" data-id="${item.id}" style="margin-bottom: 15px; padding: 15px; border-radius: 8px; border: 1px solid #ccc;">
                 <h3 style="margin-top: 0; color: #17352b;">${item.name}</h3>
                 <p style="margin: 5px 0;"><strong>Categoria:</strong> ${item.category}</p>
-                <p style="margin: 5px 0;"><strong>Validade:</strong> ${item.expiry ? item.expiry : 'N/A'}</p>
+                <p style="margin: 5px 0;"><strong>Validade:</strong> ${item.expiry ?  new Date(item.expiry).toLocaleDateString('pt-PT') : 'N/A'}</p>
                 
                 <!-- MODO VISUALIZAÇÃO -->
                 <div class="view-mode">

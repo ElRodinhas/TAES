@@ -1,0 +1,31 @@
+{
+  "name": "taes",
+  "version": "1.0.0",
+  "description": "Smart Pantry PWA - TAES",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "roots": [
+      "<rootDir>/PWA"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElRodinhas/TAES.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ElRodinhas/TAES/issues"
+  },
+  "homepage": "https://github.com/ElRodinhas/TAES#readme",
+  "devDependencies": {
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2"
+  }
+}

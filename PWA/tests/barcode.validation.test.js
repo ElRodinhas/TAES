@@ -1,4 +1,4 @@
-// Executar: node --test scanner.validation.test.js
+// Executar: node --test barcode.validation.test.js
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -44,21 +44,21 @@ function criarAmbiente(barcode = '') {
     };
 }
 
-test('aceita códigos EAN-8, EAN-13, UPC-A e UPC-E com dígito de controlo válido', () => {
+test('SCRUM-58: aceita códigos EAN-8, EAN-13, UPC-A e UPC-E com dígito de controlo válido', () => {
     const { context } = criarAmbiente();
     for (const code of ['96385074', '4006381333931', '036000291452', '00000019']) {
         assert.equal(context.codigoBarrasValido(code), true, code);
     }
 });
 
-test('rejeita dígitos de controlo errados, letras e comprimentos não suportados', () => {
+test('SCRUM-58: rejeita dígitos de controlo errados, letras e comprimentos não suportados', () => {
     const { context } = criarAmbiente();
     for (const code of ['96385075', '4006381333932', '036000291453', 'ABC123', '1234567', '12 345678', '']) {
         assert.equal(context.codigoBarrasValido(code), false, code);
     }
 });
 
-test('não grava nem altera o inventário quando o código é inválido', () => {
+test('SCRUM-58: não grava nem altera o inventário quando o código é inválido', () => {
     const app = criarAmbiente('4006381333932');
     app.storage.set('smartPantry_inventory', JSON.stringify([{ name: 'Leite', quantity: 1 }]));
     const antes = app.storage.get('smartPantry_inventory');
@@ -69,7 +69,7 @@ test('não grava nem altera o inventário quando o código é inválido', () => 
     assert.equal(app.fields.barcodeVal.focused, true);
 });
 
-test('grava um produto com código válido sem perder zeros iniciais', () => {
+test('SCRUM-58: grava um produto com código válido sem perder zeros iniciais', () => {
     const app = criarAmbiente('036000291452');
     app.save();
     const inventory = JSON.parse(app.storage.get('smartPantry_inventory'));
@@ -78,7 +78,7 @@ test('grava um produto com código válido sem perder zeros iniciais', () => {
     assert.equal(app.fields['form-msg'].className, 'success');
 });
 
-test('mantém entrada manual de produtos sem código de barras', () => {
+test('SCRUM-58: mantém entrada manual de produtos sem código de barras', () => {
     const app = criarAmbiente('');
     app.save();
     const inventory = JSON.parse(app.storage.get('smartPantry_inventory'));
@@ -86,7 +86,7 @@ test('mantém entrada manual de produtos sem código de barras', () => {
     assert.equal(inventory[0].name, 'Leite');
 });
 
-test('rejeita o mesmo código de barras para outro produto', () => {
+test('SCRUM-58: rejeita o mesmo código de barras para outro produto', () => {
     const app = criarAmbiente('4006381333931');
     app.storage.set('smartPantry_inventory', JSON.stringify([
         { name: 'Arroz', barcode: '4006381333931', quantity: 1 }
@@ -102,7 +102,7 @@ test('rejeita o mesmo código de barras para outro produto', () => {
     assert.equal(app.fields.barcodeVal.focused, true);
 });
 
-test('permite aumentar a quantidade do mesmo produto com o mesmo código', () => {
+test('SCRUM-58: permite aumentar a quantidade do mesmo produto com o mesmo código', () => {
     const app = criarAmbiente('4006381333931');
     app.storage.set('smartPantry_inventory', JSON.stringify([
         { name: 'leite', barcode: '4006381333931', quantity: 1 }
@@ -116,7 +116,7 @@ test('permite aumentar a quantidade do mesmo produto com o mesmo código', () =>
     assert.equal(app.fields['form-msg'].className, 'success');
 });
 
-test('permite produtos diferentes com códigos diferentes', () => {
+test('SCRUM-58: permite produtos diferentes com códigos diferentes', () => {
     const app = criarAmbiente('4006381333931');
     app.storage.set('smartPantry_inventory', JSON.stringify([
         { name: 'Arroz', barcode: '96385074', quantity: 1 }
@@ -130,7 +130,7 @@ test('permite produtos diferentes com códigos diferentes', () => {
     assert.equal(inventory[1].barcode, '4006381333931');
 });
 
-test('remove espaços do código sem perder zeros iniciais', () => {
+test('SCRUM-58: remove espaços do código sem perder zeros iniciais', () => {
     const app = criarAmbiente(' 036000291452 ');
 
     app.save();
