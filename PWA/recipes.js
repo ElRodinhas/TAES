@@ -267,12 +267,14 @@ async function procurarReceitas() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const btnFetch = document.getElementById('btn-fetch-recipes');
-    if (btnFetch) {
-        btnFetch.addEventListener('click', procurarReceitas);
-    }
-});
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnFetch = document.getElementById('btn-fetch-recipes');
+        if (btnFetch) {
+            btnFetch.addEventListener('click', procurarReceitas);
+        }
+    });
+}
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
