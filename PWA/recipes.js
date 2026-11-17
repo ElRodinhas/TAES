@@ -1,17 +1,150 @@
-//Coonfiguração da API
+// Configuração da API
 const API_KEY = "5961276e67e64480bac8833f29cc17be";
+const HOUSEHOLDS_STORAGE_KEY = "smartPantry.households.v1";
+
+const ALLERGY_TO_INTOLERANCE = {
+    Milk: "dairy",
+    Eggs: "egg",
+    Peanuts: "peanut",
+    "Tree nuts": "tree nut",
+    Wheat: "wheat",
+    Soy: "soy",
+    Fish: "seafood",
+    Shellfish: "shellfish",
+    Sesame: "sesame"
+};
+
+const ALLERGY_KEYWORDS = {
+    Milk: ["milk", "cheese", "mozzarella", "provolone", "parmesan", "cheddar", "butter", "cream", "yogurt", "whey", "dairy"],
+    Eggs: ["egg", "eggs", "mayonnaise"],
+    Peanuts: ["peanut", "peanuts"],
+    "Tree nuts": ["almond", "almonds", "walnut", "walnuts", "cashew", "cashews", "pecan", "pecans", "hazelnut", "hazelnuts", "pistachio", "pistachios", "macadamia"],
+    Wheat: ["wheat", "flour", "bread", "pasta", "spaghetti", "penne", "linguine", "farfalle", "orecchiette", "noodle", "noodles"],
+    Soy: ["soy", "soya", "tofu", "edamame", "miso", "tempeh"],
+    Fish: ["fish", "salmon", "tuna", "cod", "anchovy", "anchovies", "sardine", "sardines", "trout"],
+    Shellfish: ["shrimp", "prawns", "prawn", "crab", "lobster", "clam", "clams", "mussel", "mussels", "oyster", "oysters", "scallop", "scallops", "squid"],
+    Sesame: ["sesame", "tahini"]
+};
+
+const MEAT_KEYWORDS = ["beef", "pork", "chicken", "turkey", "bacon", "ham", "lamb", "sausage", "meat", "veal", "duck", "prosciutto", "salami", "pepperoni"];
+const SEAFOOD_KEYWORDS = [...ALLERGY_KEYWORDS.Fish, ...ALLERGY_KEYWORDS.Shellfish, "seafood"];
+const NON_VEGAN_KEYWORDS = [...MEAT_KEYWORDS, ...SEAFOOD_KEYWORDS, ...ALLERGY_KEYWORDS.Milk, ...ALLERGY_KEYWORDS.Eggs, "honey"];
+
+function obterPerfilAtivo() {
+    try {
+        if (typeof window !== "undefined" && window.SmartPantryProfiles?.readStoredState) {
+            const state = window.SmartPantryProfiles.readStoredState();
+            return state.households.find((h) => h.id === state.activeHouseholdId) || null;
+        }
+        const raw = localStorage.getItem(HOUSEHOLDS_STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed.households)) return null;
+        return parsed.households.find((h) => h.id === parsed.activeHouseholdId) || parsed.households[0] || null;
+    } catch (error) {
+        return null;
+    }
+}
+
+function contemTermo(texto, termos) {
+    return termos.some((termo) => {
+        const escaped = termo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const regex = new RegExp(`\\b${escaped}\\b`, "i");
+        return regex.test(texto);
+    });
+}
+
+function receitaAdequadaAoPerfil(receita, perfil) {
+    if (!perfil) return true;
+
+    const nomesIngredientes = [
+        receita.title || "",
+        ...(receita.usedIngredients || []).map((i) => i.name || ""),
+        ...(receita.missedIngredients || []).map((i) => i.name || "")
+    ].join(" ").toLowerCase();
+
+    // 1. Verificar estilo de vida / dieta
+    if (perfil.lifestyle === "vegan") {
+        if (receita.vegan === false || contemTermo(nomesIngredientes, NON_VEGAN_KEYWORDS)) {
+            return false;
+        }
+    } else if (perfil.lifestyle === "vegetarian") {
+        if (receita.vegetarian === false || contemTermo(nomesIngredientes, [...MEAT_KEYWORDS, ...SEAFOOD_KEYWORDS])) {
+            return false;
+        }
+    } else if (perfil.lifestyle === "pescatarian") {
+        if (contemTermo(nomesIngredientes, MEAT_KEYWORDS)) {
+            return false;
+        }
+    }
+
+    // 2. Verificar alergias
+    const alergias = Array.isArray(perfil.allergies) ? perfil.allergies : [];
+    for (const alergia of alergias) {
+        const keywords = ALLERGY_KEYWORDS[alergia] || [alergia.toLowerCase()];
+        if (contemTermo(nomesIngredientes, keywords)) {
+            return false;
+        }
+    }
+
+    // 3. Verificar ingredientes excluídos
+    const excluidos = Array.isArray(perfil.excludedIngredients) ? perfil.excludedIngredients : [];
+    for (const excluido of excluidos) {
+        const limpo = excluido.trim().toLowerCase();
+        if (limpo && nomesIngredientes.includes(limpo)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function filtrarReceitasPorPerfil(receitas, perfil) {
+    return receitas.filter((receita) => receitaAdequadaAoPerfil(receita, perfil));
+}
+
+function construirUrlReceitas(nomesIngredientes, perfil) {
+    const params = new URLSearchParams({
+        includeIngredients: nomesIngredientes,
+        fillIngredients: "true",
+        addRecipeInformation: "true",
+        number: "10",
+        apiKey: API_KEY
+    });
+
+    if (perfil) {
+        if (["vegetarian", "vegan", "pescatarian"].includes(perfil.lifestyle)) {
+            params.set("diet", perfil.lifestyle);
+        }
+        if (Array.isArray(perfil.allergies) && perfil.allergies.length > 0) {
+            const intolerances = perfil.allergies
+                .map((a) => ALLERGY_TO_INTOLERANCE[a])
+                .filter(Boolean);
+            if (intolerances.length > 0) {
+                params.set("intolerances", intolerances.join(","));
+            }
+        }
+        if (Array.isArray(perfil.excludedIngredients) && perfil.excludedIngredients.length > 0) {
+            params.set("excludeIngredients", perfil.excludedIngredients.join(","));
+        }
+    }
+
+    return `https://api.spoonacular.com/recipes/complexSearch?${params.toString()}`;
+}
 
 function analisarReceita(ingredientesDespensa, receita) {
-    const totalIngredientes = receita.usedIngredients.length + receita.missedIngredients.length;
+    const used = receita.usedIngredients || [];
+    const missed = receita.missedIngredients || [];
+    const totalIngredientes = used.length + missed.length;
 
     const percentagem = totalIngredientes > 0
-        ? Math.round((receita.usedIngredients.length / totalIngredientes) * 100)
+        ? Math.round((used.length / totalIngredientes) * 100)
         : 0;
 
     return {
         percentagem: percentagem,
-        tens: receita.usedIngredients.map(i => i.name),
-        falta: receita.missedIngredients.map(i => i.name)
+        tens: used.map(i => i.name),
+        falta: missed.map(i => i.name)
     };
 }
 
@@ -22,7 +155,7 @@ async function procurarReceitas() {
     const lista = document.getElementById('recipes-list');
     const countEl = document.getElementById('recipe-count');
 
-    // buscar o inventário ao localStorage
+    // Buscar o inventário ao localStorage
     const inventario = JSON.parse(localStorage.getItem('smartPantry_inventory')) || [];
 
     if (inventario.length === 0) {
@@ -32,7 +165,7 @@ async function procurarReceitas() {
         return;
     }
 
-    // Preparar os ingredientes para a API (nomes separados por vírgula)
+    const perfilAtivo = obterPerfilAtivo();
     const nomesIngredientes = inventario.map(item => item.name).join(',');
 
     // Estado de loading
@@ -42,27 +175,28 @@ async function procurarReceitas() {
     loading.style.display = 'block';
 
     try {
-        // 2. Fazer o pedido à API
-        const url = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${encodeURIComponent(nomesIngredientes)}&number=5&ranking=1&apiKey=${API_KEY}`;
+        const url = construirUrlReceitas(nomesIngredientes, perfilAtivo);
         const response = await fetch(url);
 
         if (!response.ok) throw new Error('Falha ao contactar a API.');
 
-        const receitas = await response.json();
+        const data = await response.json();
+        const receitasBrutas = Array.isArray(data) ? data : (data.results || []);
+        const receitas = filtrarReceitasPorPerfil(receitasBrutas, perfilAtivo).slice(0, 5);
 
-        // 3. Processar e Renderizar
+        // Processar e Renderizar
         loading.style.display = 'none';
         countEl.textContent = receitas.length;
 
         if (receitas.length === 0) {
-            msg.textContent = "Não foram encontradas receitas com os teus ingredientes.";
+            msg.textContent = "Não foram encontradas receitas adequadas ao teu perfil e ingredientes.";
             msg.hidden = false;
             btn.disabled = false;
             return;
         }
 
         receitas.sort((a, b) => {
-            const usaExpirados = (r) => r.usedIngredients.some(ing => {
+            const usaExpirados = (r) => (r.usedIngredients || []).some(ing => {
                 const itemDespensa = inventario.find(i => i.name.toLowerCase() === ing.name.toLowerCase());
                 return itemDespensa && estaQuaseAExpirar(itemDespensa.expiry);
             });
@@ -70,12 +204,8 @@ async function procurarReceitas() {
             const aTemExpirados = usaExpirados(a);
             const bTemExpirados = usaExpirados(b);
 
-            // Se 'a' tem expirados e 'b' não, 'a' vai para cima (-1)
             if (aTemExpirados && !bTemExpirados) return -1;
-            // Se 'b' tem expirados e 'a' não, 'b' vai para cima (1)
             if (!aTemExpirados && bTemExpirados) return 1;
-            
-            // Se ambos têm (ou ambos não têm), mantém a ordem
             return 0;
         });
 
@@ -83,12 +213,11 @@ async function procurarReceitas() {
         receitas.forEach(receita => {
             const analise = analisarReceita(inventario, receita);
 
-            const usaExpirados = receita.usedIngredients.some(ing => {
+            const usaExpirados = (receita.usedIngredients || []).some(ing => {
                 const itemDespensa = inventario.find(i => i.name.toLowerCase() === ing.name.toLowerCase());
                 return itemDespensa && estaQuaseAExpirar(itemDespensa.expiry);
             });
 
-            // Criar o cartão
             const card = document.createElement('article');
             card.className = 'household-card';
             card.style.display = 'flex';
@@ -146,5 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { analisarReceita };
+    module.exports = {
+        analisarReceita,
+        obterPerfilAtivo,
+        receitaAdequadaAoPerfil,
+        filtrarReceitasPorPerfil,
+        construirUrlReceitas
+    };
 }
