@@ -86,7 +86,7 @@
     });
   }
 
-  window.SmartPantryProfiles = { readStoredState, renderSwitcher, initSwitcher, LIFESTYLES };
+  window.SmartPantryProfiles = { readStoredState, renderSwitcher, initSwitcher, isValidHousehold, LIFESTYLES };
   // The household page initializes with a callback to refresh its active card.
   if (!$('household-form')) initSwitcher();
 })();

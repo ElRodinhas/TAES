@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#17352b">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/png" href="./icons/icon-192.png">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Smart Pantry - Receitas Guardadas</title>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand" aria-label="Smart Pantry">Smart Pantry</div>
+            <div id="profile-switcher" class="profile-switcher" data-testid="profile-switcher" hidden>
+                <label for="active-profile">Perfil ativo</label>
+                <select id="active-profile" data-testid="active-profile" aria-describedby="profile-switch-error"></select>
+                <p id="profile-switch-error" role="alert" hidden></p>
+            </div>
+            <nav class="recipe-nav" aria-label="Navegação de receitas">
+                <a href="./recipes.html" class="button button-secondary">Procurar ou gerar receitas</a>
+            </nav>
+        </div>
+    </header>
+    <main class="main">
+        <section aria-labelledby="saved-title">
+            <div class="intro">
+                <h1 id="saved-title">Receitas Guardadas</h1>
+                <p>As tuas receitas, disponíveis neste dispositivo mesmo sem ligação à Internet. Abre um cartão para ver os ingredientes e a preparação.</p>
+                <p>Partilhadas entre os perfis. Confirma se a receita é adequada ao perfil ativo, sobretudo em caso de alergia.</p>
+            </div>
+            <div class="field">
+                <label for="saved-search">Pesquisar pelo título</label>
+                <input id="saved-search" data-testid="saved-search" type="search" placeholder="Ex.: arroz de tomate" aria-controls="saved-recipes">
+            </div>
+            <p id="saved-status" data-testid="saved-status" role="status" aria-live="polite"></p>
+            <div id="saved-recipes" data-testid="saved-recipes" class="household-list"></div>
+        </section>
+    </main>
+    <script src="./profiles.js"></script>
+    <script src="./recipe-book.js"></script>
+</body>
+</html>
