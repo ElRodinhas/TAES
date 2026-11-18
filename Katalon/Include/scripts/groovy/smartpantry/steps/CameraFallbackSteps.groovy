@@ -79,7 +79,7 @@ class CameraFallbackSteps {
     def userUploadsBarcodeImage() {
         // Vai buscar o caminho absoluto da pasta do teu projeto Katalon
         String projectDir = com.kms.katalon.core.configuration.RunConfiguration.getProjectDir()
-        String imagePath = projectDir + "/images/barcode_test.jpeg"
+        String imagePath = projectDir + "/images/barcode_test.png"
         
         WebUI.uploadFile(createTestObject("barcodeFile"), imagePath)
         WebUI.delay(2) // Espera que a biblioteca html5-qrcode leia a imagem
