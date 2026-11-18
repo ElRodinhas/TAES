@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SPIKE: Local Persistence</title>
+</head>
+<body>
+    <h1>Teste de Persistência</h1>
+    <button onclick="saveData()">Guardar Perfil</button>
+    <button onclick="loadData()">Carregar Perfil</button>
+    <button onclick="clearData()">Limpar Tudo</button>
+    <pre id="output">Nenhum dado carregado.</pre>
+
+    <script>
+        function saveData() {
+            const perfil = {
+                nome: "João",
+                despensa: ["Maçã", "Leite"],
+                listaCompras: ["Pão", "Ovos"]
+            };
+            localStorage.setItem("userProfile", JSON.stringify(perfil));
+            document.getElementById("output").innerText = "Dados guardados com sucesso!\n" + JSON.stringify(perfil, null, 2);
+        }
+
+        function loadData() {
+            const data = localStorage.getItem("userProfile");
+            if (data) {
+                const perfil = JSON.parse(data);
+                document.getElementById("output").innerText = "Dados carregados do browser:\n" + JSON.stringify(perfil, null, 2);
+            } else {
+                document.getElementById("output").innerText = "Nenhum dado encontrado.";
+            }
+        }
+
+        function clearData() {
+            localStorage.removeItem("userProfile");
+            document.getElementById("output").innerText = "Dados limpos.";
+        }
+
+        window.onload = () => {
+            loadData();
+        };
+    </script>
+</body>
+</html>
