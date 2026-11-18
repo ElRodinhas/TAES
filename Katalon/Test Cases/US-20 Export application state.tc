@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>US-20 JSON export of saved application state</description>
+   <name>US-20 Export application state</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>e0a14f39-71b7-4f50-a948-c6a442e41b10</testCaseGuid>
+</TestCaseEntity>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Restore Smart Pantry JSON backups with validation and cancellation</description>
+   <name>Import application state</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>dd5b508f-fdf9-480b-95e0-17339a639f55</testCaseGuid>
+</TestCaseEntity>
