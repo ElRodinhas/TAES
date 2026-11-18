@@ -89,3 +89,10 @@ Thumbs.db
 # Temporary files
 *.log
 *.tmp
+
+# Local server credentials and experiment output
+.env
+.env.*
+!.env.example
+__pycache__/
+.recipe-spike-evidence-*.json
