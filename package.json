@@ -4,6 +4,7 @@
   "description": "Smart Pantry PWA - TAES",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "test": "jest"
   },
   "jest": {

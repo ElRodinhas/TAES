@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>US-15 recipe generation, ingredient consent, local saving and failure handling</description>
+   <name>US-15 Generate recipes</name>
+   <tag>US15</tag>
+   <comment></comment>
+   <testCaseGuid>efaf2b90-0ba4-46c1-b561-6ad5310516ce</testCaseGuid>
+</TestCaseEntity>

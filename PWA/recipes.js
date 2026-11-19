@@ -148,6 +148,55 @@ function analisarReceita(ingredientesDespensa, receita) {
     };
 }
 
+//adicionar os ingredientes que faltam à lista de compras
+function addMissingIngredientsToShoppingList(missedIngredients) {
+    const inventory = JSON.parse(localStorage.getItem("smartPantry_inventory")) || [];
+    let shoppingList = JSON.parse(localStorage.getItem("smartPantry.shoppingList")) || [];
+
+    let addedCount = 0;
+
+    missedIngredients.forEach(ingredient => {
+        const ingredientName = ingredient.name;
+
+        // Verifica se o ingrediente já está na despensa
+        const isInStock = inventory.some(item =>
+            item.name.toLowerCase().trim() === ingredientName.toLowerCase().trim()
+        );
+
+        if (!isInStock) {
+            const alreadyInShoppingList = shoppingList.some(item =>
+                item.name.toLowerCase().trim() === ingredientName.toLowerCase().trim()
+            );
+
+            if (!alreadyInShoppingList) {
+                shoppingList.push({
+                    name: ingredientName,
+                    quantity: ingredient.amount || 1,
+                    unit: ingredient.unit || "un",
+                    checked: false
+                });
+                addedCount++;
+            }
+        }
+    });
+
+    if (addedCount > 0) {
+        localStorage.setItem("smartPantry.shoppingList", JSON.stringify(shoppingList));
+        alert(`${addedCount} missing ingredient(s) added to your shopping list!`);
+    } else {
+        alert("All ingredients are already in your pantry or shopping list!");
+    }
+}
+
+let receitasAtuais = [];
+
+function handleAddMissingIngredients(index) {
+    const receita = receitasAtuais[index];
+    if (receita && receita.missedIngredients) {
+        addMissingIngredientsToShoppingList(receita.missedIngredients);
+    }
+}
+
 async function procurarReceitas() {
     const btn = document.getElementById('btn-fetch-recipes');
     const msg = document.getElementById('recipe-msg');
@@ -184,7 +233,9 @@ async function procurarReceitas() {
         const receitasBrutas = Array.isArray(data) ? data : (data.results || []);
         const receitas = filtrarReceitasPorPerfil(receitasBrutas, perfilAtivo).slice(0, 5);
 
-        // Processar e Renderizar
+        receitasAtuais = receitas;
+
+        // 3. Processar e Renderizar
         loading.style.display = 'none';
         countEl.textContent = receitas.length;
 
@@ -206,6 +257,8 @@ async function procurarReceitas() {
 
             if (aTemExpirados && !bTemExpirados) return -1;
             if (!aTemExpirados && bTemExpirados) return 1;
+
+            // Se ambos têm (ou ambos não têm), mantém a ordem
             return 0;
         });
 
@@ -251,6 +304,10 @@ async function procurarReceitas() {
                             <strong>❌ Falta:</strong> ${analise.falta.join(', ') || 'Nada!'}
                         </p>
                     </div>
+                     <button class="button button-primary" style="margin-top: 10px; width: 100%;" 
+                        onclick="handleAddMissingIngredients(${receitas.indexOf(receita)})">
+                        Adicionar Ingredientes em Falta 🛒
+                    </button>
                 </div>
             `;
             lista.appendChild(card);
