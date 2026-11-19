@@ -17,13 +17,17 @@
             <div class="brand" aria-label="Smart Pantry">Smart Pantry</div>
             <div id="profile-switcher" class="profile-switcher" data-testid="profile-switcher" hidden>
                 <label for="active-profile">Perfil ativo</label>
-                <select id="active-profile" data-testid="active-profile" aria-describedby="profile-switch-error"></select>
+                <select id="active-profile" data-testid="active-profile"
+                    aria-describedby="profile-switch-error"></select>
                 <p id="profile-switch-error" role="alert" hidden></p>
             </div>
             <nav class="recipe-nav" aria-label="Navegação de receitas">
-                <a href="./pantry.html" class="button button-secondary" style="text-decoration: none;">Voltar à Despensa</a>
-                <a id="saved-recipes-link" data-testid="saved-recipes-link" href="./saved-recipes.html" class="button button-secondary">Receitas Guardadas</a>
+                <a href="./pantry.html" class="button button-secondary" style="text-decoration: none;">Voltar à
+                    Despensa</a>
+                <a id="saved-recipes-link" data-testid="saved-recipes-link" href="./saved-recipes.html"
+                    class="button button-secondary">Receitas Guardadas</a>
             </nav>
+            <a href="./shopping-list.html" class="button button-secondary">Lista de Compras 🛒</a>
         </div>
     </header>
 
@@ -31,7 +35,8 @@
         <section id="recipes-screen" aria-labelledby="recipes-title">
             <div class="intro">
                 <h1 id="recipes-title">O que posso cozinhar?</h1>
-                <p>Receitas sugeridas com base no stock atual da tua despensa. Os produtos quase a expirar aparecem primeiro.</p>
+                <p>Receitas sugeridas com base no stock atual da tua despensa. Os produtos quase a expirar aparecem
+                    primeiro.</p>
             </div>
 
             <div class="form-card" style="display: flex; justify-content: space-between; align-items: center;">
@@ -66,17 +71,23 @@
                 <input id="leftover-name" data-testid="leftover-name" maxlength="100" placeholder="Ex.: arroz cozido">
                 <label for="leftover-amount">Quantidade disponível (opcional)</label>
                 <input id="leftover-amount" data-testid="leftover-amount" maxlength="100" placeholder="Ex.: 200 g">
-                <button id="add-leftover" data-testid="add-leftover" type="button" class="button button-secondary">Adicionar ingrediente</button>
+                <button id="add-leftover" data-testid="add-leftover" type="button"
+                    class="button button-secondary">Adicionar ingrediente</button>
                 <ul id="leftover-list" data-testid="leftover-list"></ul>
                 <label for="generation-servings">Número de porções</label>
-                <input id="generation-servings" data-testid="generation-servings" type="number" min="1" max="30" step="1" required>
-                <p>Os ingredientes, quantidades, restrições e porções são enviados à Google Gemini para gerar a receita. Não enviamos o nome do perfil.</p>
-                <button id="generate-recipe" data-testid="generate-recipe" class="button button-primary" type="submit">Gerar receita</button>
+                <input id="generation-servings" data-testid="generation-servings" type="number" min="1" max="30"
+                    step="1" required>
+                <p>Os ingredientes, quantidades, restrições e porções são enviados à Google Gemini para gerar a receita.
+                    Não enviamos o nome do perfil.</p>
+                <button id="generate-recipe" data-testid="generate-recipe" class="button button-primary"
+                    type="submit">Gerar receita</button>
             </form>
             <p id="generation-message" data-testid="generation-message" role="status" aria-live="polite"></p>
             <div id="missing-consent" data-testid="missing-consent" hidden>
-                <p>Não foi possível propor uma receita só com estes ingredientes. Queres permitir ingredientes adicionais? Serão assinalados como em falta.</p>
-                <button id="allow-missing" data-testid="allow-missing" class="button button-secondary" type="button">Permitir ingredientes em falta</button>
+                <p>Não foi possível propor uma receita só com estes ingredientes. Queres permitir ingredientes
+                    adicionais? Serão assinalados como em falta.</p>
+                <button id="allow-missing" data-testid="allow-missing" class="button button-secondary"
+                    type="button">Permitir ingredientes em falta</button>
                 <button id="cancel-missing" class="button button-secondary" type="button">Cancelar</button>
             </div>
             <div id="generated-recipe" data-testid="generated-recipe"></div>
