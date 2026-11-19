@@ -90,6 +90,7 @@ Thumbs.db
 *.log
 *.tmp
 
+node_modules/
 # Local server credentials and experiment output
 .env
 .env.*
