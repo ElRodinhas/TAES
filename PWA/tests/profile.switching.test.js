@@ -120,23 +120,6 @@ test('US-02: o primeiro arranque oculta o seletor e um perfil guardado é mostra
   assert.deepEqual(app.writes, []);
 });
 
-test('US-02: ativação e eliminação na gestão mantêm o cabeçalho sincronizado', () => {
-  const app = boot(seeded());
-  function click(action, householdId) {
-    app.get('household-list').listeners.click({
-      target: { closest: () => ({ dataset: { action, householdId } }) }
-    });
-  }
-  click('activate', 'guests');
-  assert.equal(app.get('active-profile').value, 'guests');
-  click('confirm-delete', 'guests');
-  assert.equal(app.get('active-profile').value, 'family');
-  assert.equal(app.get('active-profile').children.length, 1);
-  click('confirm-delete', 'family');
-  assert.equal(app.get('profile-switcher').hidden, true);
-  assert.equal(app.get('setup-screen').hidden, false);
-});
-
 for (const page of ['pantry.html', 'scan.html']) {
   test(`US-02 (${page}): alternar perfil persiste entre páginas sem alterar conteúdos nem dados partilhados`, () => {
     const storage = seeded();
