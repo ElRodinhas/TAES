@@ -46,6 +46,11 @@ class BarcodeSteps {
 		WebUI.executeJavaScript("localStorage.removeItem('smartPantry_inventory');", null)
 		WebUI.maximizeWindow()
 		
+		TestObject btnFallback = createTestObject("btn-force-fallback")
+		WebUI.waitForElementClickable(btnFallback, 10)
+		WebUI.click(btnFallback)
+		
+		
 		// Garante que a caixa de texto manual está visível
 		WebUI.waitForElementVisible(createTestObject("manualBarcode"), 10)
 	}
@@ -141,8 +146,8 @@ class BarcodeSteps {
 	
 	@When("fills the required form fields")
 	def fillsRequiredFormFields() {
-		// Preenche a data de validade (formato YYYY-MM-DD)
-		WebUI.setText(createTestObject("productExpiry"), "2026-12-31")
+		// Preenche a data de validade 
+		WebUI.setText(createTestObject("productExpiry"), "31-12-2026")
 		
 		// Garante que a quantidade está preenchida
 		WebUI.setText(createTestObject("productQty"), "1")

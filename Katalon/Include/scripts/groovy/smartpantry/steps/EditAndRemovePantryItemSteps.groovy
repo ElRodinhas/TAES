@@ -18,6 +18,7 @@ class EditAndRemovePantryItemSteps {
 
     @Given("the user is on the pantry list page")
     def userOnPantryPage() {
+		WebUI.openBrowser('')
         WebUI.navigateToUrl("http://localhost:8000/pantry.html") // Ajusta a porta se necessário
         WebUI.waitForPageLoad(5)
     }
