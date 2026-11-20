@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Initial household setup</description>
+   <name>US-01 Initial household setup</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>15775021-b932-4b1b-a1ca-1581f608466d</testCaseGuid>
+</TestCaseEntity>

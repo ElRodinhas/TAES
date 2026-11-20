@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Manage profiles</description>
+   <name>US-03 Manage profiles</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>2f26b7f6-5607-4486-ae18-2abbf438f3fa</testCaseGuid>
+</TestCaseEntity>

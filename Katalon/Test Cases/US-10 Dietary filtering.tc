@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Dietary Filtering</description>
+   <name>US-10 Dietary filtering</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>baa37cfc-c9fd-49a0-bfc6-562a8a9b0963</testCaseGuid>
+</TestCaseEntity>
