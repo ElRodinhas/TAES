@@ -1,4 +1,3 @@
-
 @tag
 Feature: Barcode Scanning and Form Auto-fill
 
