@@ -33,7 +33,7 @@ function boot(today = [2026, 10, 24]) {
   } };
 }
 
-test('the pantry window includes today, 24 and 48 hours, excluding expired and later items', () => {
+test('US-24: The pantry window includes today, 24 and 48 hours, excluding expired and later items', () => {
   const { context } = boot();
   for (const [date, expected] of [
     ['2026-11-23', 'expirado'], ['2026-11-24', 'quase'],
@@ -47,7 +47,7 @@ test('the pantry window includes today, 24 and 48 hours, excluding expired and l
   assert.equal(context.estaQuaseAExpirar('2026-11-27'), true);
 });
 
-test('calendar-day boundaries work across daylight saving and month/year changes', () => {
+test('US-24: Calendar-day boundaries work across daylight saving and month/year changes', () => {
   for (const [today, expiry] of [
     [[2026, 2, 28], '2026-03-30'], // Lisbon switches to summer time.
     [[2026, 9, 24], '2026-10-26'], // Lisbon switches back to winter time.
@@ -59,7 +59,7 @@ test('calendar-day boundaries work across daylight saving and month/year changes
   }
 });
 
-test('tray and inventory warning include only soon-expiring items, escaping saved names', () => {
+test('US-24: Tray and inventory warning include only soon-expiring items, escaping saved names', () => {
   const app = boot();
   app.render([
     { id: 'soon', name: 'Milk <script>', expiry: '2026-11-25' },
@@ -84,7 +84,7 @@ test('tray and inventory warning include only soon-expiring items, escaping save
   assert.doesNotMatch(html, /<script>/);
 });
 
-test('rerendering clears stale tray entries and hides an empty tray', () => {
+test('US-24: Rerendering clears stale tray entries and hides an empty tray', () => {
   const app = boot();
   app.render([{ id: 'soon', name: 'Milk', expiry: '2026-11-25' }]);
   assert.equal(app.get('expiry-alert-tray').hidden, false);
