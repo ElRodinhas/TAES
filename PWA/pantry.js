@@ -8,6 +8,12 @@ function escapePantryText(value) {
 function renderPantry() {
     const pantryListContainer = document.getElementById('pantry-list');
     const inventory = JSON.parse(localStorage.getItem('smartPantry_inventory')) || [];
+    // US-06 uses today through two calendar days ahead, inclusive.
+    const expiringSoon = inventory.filter(item => obterEstadoValidade(item.expiry, 2) === 'quase');
+    document.getElementById('expiry-alert-items').innerHTML = expiringSoon.map(item =>
+        `<li><strong>${escapePantryText(item.name)}</strong></li>`
+    ).join('');
+    document.getElementById('expiry-alert-tray').hidden = expiringSoon.length === 0;
 
     if (inventory.length === 0) {
         pantryListContainer.innerHTML = '<p style="text-align: center;">A tua despensa está vazia.</p>';
@@ -16,18 +22,20 @@ function renderPantry() {
 
     let htmlContent = '';
     inventory.forEach(item => {
-        const estado = obterEstadoValidade(item.expiry); 
+        const estado = obterEstadoValidade(item.expiry, 2);
+        let alertaHtml = '';
         if (estado === 'expirado') {
-            alertaHtml = `<p style="background-color: #ffebee; color: #c62828; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; margin: 5px 0;"><strong>❌ Expirado!</strong></p>`;
+            alertaHtml = '<p class="expiry-warning expiry-warning-expired"><strong>❌ Expirado!</strong></p>';
         } else if (estado === 'quase') {
-            alertaHtml = `<p style="background-color: #fff3cd; color: #856404; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; margin: 5px 0;"><strong>⚠️ Expira em breve!</strong></p>`;
+            alertaHtml = '<p class="expiry-warning" data-testid="expiry-warning"><strong>⚠️ Expira em breve!</strong></p>';
         }
 
         htmlContent += `
             <div class="form-card pantry-item" data-id="${escapePantryText(item.id)}" style="margin-bottom: 15px; padding: 15px; border-radius: 8px; border: 1px solid #ccc;">
                 <h3 style="margin-top: 0; color: #17352b;">${escapePantryText(item.name)}</h3>
+                ${alertaHtml}
                 <p style="margin: 5px 0;"><strong>Categoria:</strong> ${escapePantryText(item.category)}</p>
-                <p style="margin: 5px 0;"><strong>Validade:</strong> ${item.expiry ?  new Date(item.expiry).toLocaleDateString('pt-PT') : 'N/A'}</p>
+                <p style="margin: 5px 0;"><strong>Validade:</strong> ${item.expiry ? new Date(item.expiry + 'T00:00:00').toLocaleDateString('pt-PT') : 'N/A'}</p>
                 
                 <!-- MODO VISUALIZAÇÃO -->
                 <div class="view-mode">
