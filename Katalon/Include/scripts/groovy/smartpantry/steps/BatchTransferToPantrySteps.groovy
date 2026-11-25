@@ -72,12 +72,13 @@ class BatchTransferToPantrySteps {
     private void fillTransferRow(int index, String qty, String category, String expiry) {
         TestObject qtyInput = createById("batch-qty-${index}")
         TestObject catSelect = createById("batch-category-${index}")
-        TestObject expInput = createById("batch-expiry-${index}")
 
         WebUI.setText(qtyInput, qty)
         WebUI.selectOptionByValue(catSelect, category, false)
-        // Definir data diretamente via JS para evitar diferenças de formato regional do input[type=date]
-        WebUI.executeJavaScript("document.getElementById(arguments[0]).value = arguments[1];", Arrays.asList("batch-expiry-${index}", expiry))
+        WebUI.executeJavaScript(
+            "document.getElementById(arguments[0]).value = arguments[1];",
+            Arrays.asList("batch-expiry-${index}".toString(), expiry)
+        )
     }
 
     @When("sets custom quantity {string}, category {string}, and expiry {string} for the first item")
