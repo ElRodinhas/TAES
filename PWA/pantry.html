@@ -35,6 +35,13 @@
                 O que posso cozinhar?
             </button>
 
+            <section id="expiry-alert-tray" class="expiry-alert-tray" data-testid="expiry-alert-tray"
+                aria-labelledby="expiry-alert-title" aria-live="polite" hidden>
+                <h2 id="expiry-alert-title">A usar primeiro</h2>
+                <p>Estes produtos expiram nos próximos 2 dias:</p>
+                <ul id="expiry-alert-items"></ul>
+            </section>
+
             <div id="pantry-list" class="result-box" style="margin-top: 15px;">
                 <!-- Os produtos vão aparecer aqui injetados pelo JavaScript -->
             </div>

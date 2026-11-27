@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>US-06: include items expiring in 24 hours and exclude items expiring in 5 days from the alert tray.</description>
+   <name>US-06 Highlight expiring items</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>fb2981ba-cd03-4f21-87ab-c4e9a95a2366</testCaseGuid>
+</TestCaseEntity>
