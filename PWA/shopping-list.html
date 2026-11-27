@@ -19,6 +19,9 @@
 
     <main class="main">
         <h1>A Minha Lista de Compras 🛒</h1>
+
+        <p id="shopping-list-msg" role="alert" hidden></p>
+
         <div class="form-card" style="margin-bottom: 20px;">
             <h3>Adicionar Item Manualmente</h3>
             <div style="display: flex; gap: 10px; margin-top: 10px;">
@@ -29,7 +32,28 @@
         </div>
         <div class="form-card">
             <ul id="shopping-list-container" style="list-style: none; padding: 0;"></ul>
+
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button id="btn-open-batch-transfer" type="button" class="button button-primary">
+                    Transferir Selecionados para a Despensa
+                </button>
+            </div>
         </div>
+
+        <section id="batch-transfer-section" class="form-card" style="margin-top: 20px;" hidden>
+            <h2>Transferir para a Despensa</h2>
+            <p>Define a quantidade, categoria e data de validade para cada produto comprado:</p>
+            <div id="batch-transfer-items"></div>
+
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button id="btn-confirm-batch-transfer" type="button" class="button button-primary">
+                    Confirmar Transferência
+                </button>
+                <button id="btn-cancel-batch-transfer" type="button" class="button button-secondary">
+                    Cancelar
+                </button>
+            </div>
+        </section>
     </main>
 
     <script src="./shopping-list.js"></script>
