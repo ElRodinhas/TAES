@@ -26,7 +26,7 @@ Cria UMA receita praticável para exatamente servings porções. Podes usar um s
 Para ingredientes fornecidos, sourceIndex é o índice (a partir de zero) na lista de entrada e name é EXATAMENTE o nome fornecido (sem tradução); os restantes textos e ingredientes novos são pt-PT. Não inventes substituições associadas a um índice existente.
 Quando allowMissing=false, usa APENAS ingredientes fornecidos, sem assumir sal, azeite ou outros básicos. Água da torneira é permitida nos passos. Se não conseguires propor uma receita adequada, devolve status=no_recipe e recipe=null.
 Só quando allowMissing=true podes acrescentar ingredientes em falta com sourceIndex=null, assinalando assim TODOS os ingredientes novos. Minimiza os extras. Mantém sempre as restrições. Não adiciones ingredientes em falta enquanto allowMissing=false.
-Para uma receita devolve status=ready e recipe preenchida; para impossibilidade devolve status=no_recipe e recipe=null. Não inclua comentários nem Markdown.`;
+Para uma receita devolve status=ready e recipe preenchida; para impossibilidade devolve status=no_recipe e recipe=null. Não inclua comentários nem Markdown. Se os ingredientes estiverem em Inglês, traduz-os para pt-PT.`;
 
 class RecipeError extends Error {
   constructor(code, status = 422) {
