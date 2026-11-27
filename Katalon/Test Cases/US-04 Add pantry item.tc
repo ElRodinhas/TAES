@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Add pantry item</description>
+   <name>US-04 Add pantry item</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>6a66a2f0-979d-46b0-af9b-f9466d0d18a0</testCaseGuid>
+</TestCaseEntity>

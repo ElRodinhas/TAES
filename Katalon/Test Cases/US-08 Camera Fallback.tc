@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Camera Fallback</description>
+   <name>US-08 Camera Fallback</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>32155d44-25b7-4200-b164-e1c4ddf94ad9</testCaseGuid>
+</TestCaseEntity>

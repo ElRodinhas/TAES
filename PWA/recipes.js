@@ -148,43 +148,48 @@ function analisarReceita(ingredientesDespensa, receita) {
     };
 }
 
-//adicionar os ingredientes que faltam à lista de compras
+// Compare names without changing the spelling or state of existing shopping items.
+function ingredientNameKey(ingredient) {
+    return typeof ingredient?.name === "string" ? ingredient.name.trim().toLowerCase() : "";
+}
+
 function addMissingIngredientsToShoppingList(missedIngredients) {
-    const inventory = JSON.parse(localStorage.getItem("smartPantry_inventory")) || [];
-    let shoppingList = JSON.parse(localStorage.getItem("smartPantry.shoppingList")) || [];
-
-    let addedCount = 0;
-
-    missedIngredients.forEach(ingredient => {
-        const ingredientName = ingredient.name;
-
-        // Verifica se o ingrediente já está na despensa
-        const isInStock = inventory.some(item =>
-            item.name.toLowerCase().trim() === ingredientName.toLowerCase().trim()
-        );
-
-        if (!isInStock) {
-            const alreadyInShoppingList = shoppingList.some(item =>
-                item.name.toLowerCase().trim() === ingredientName.toLowerCase().trim()
-            );
-
-            if (!alreadyInShoppingList) {
-                shoppingList.push({
-                    name: ingredientName,
-                    quantity: ingredient.amount || 1,
-                    unit: ingredient.unit || "un",
-                    checked: false
-                });
-                addedCount++;
-            }
+    try {
+        // Re-read storage on every click, including changes made since discovery.
+        const inventory = JSON.parse(localStorage.getItem("smartPantry_inventory") ?? "[]");
+        const shoppingList = JSON.parse(localStorage.getItem("smartPantry.shoppingList") ?? "[]");
+        if (!Array.isArray(inventory) || !Array.isArray(shoppingList) || !Array.isArray(missedIngredients)) {
+            throw new Error("Invalid ingredient list");
         }
-    });
 
-    if (addedCount > 0) {
-        localStorage.setItem("smartPantry.shoppingList", JSON.stringify(shoppingList));
-        alert(`${addedCount} missing ingredient(s) added to your shopping list!`);
-    } else {
-        alert("All ingredients are already in your pantry or shopping list!");
+        const knownNames = new Set([...inventory, ...shoppingList].map(ingredientNameKey));
+        let addedCount = 0;
+
+        for (const ingredient of missedIngredients) {
+            const key = ingredientNameKey(ingredient);
+            if (!key || knownNames.has(key)) continue;
+
+            shoppingList.push({
+                name: ingredient.name.trim(),
+                quantity: Number.isFinite(ingredient.amount) && ingredient.amount > 0 ? ingredient.amount : 1,
+                unit: typeof ingredient.unit === "string" && ingredient.unit.trim() ? ingredient.unit.trim() : "un",
+                checked: false
+            });
+            knownNames.add(key);
+            addedCount++;
+        }
+
+        // Do not rewrite existing items when there is nothing new to add.
+        if (addedCount > 0) {
+            localStorage.setItem("smartPantry.shoppingList", JSON.stringify(shoppingList));
+            alert(`${addedCount} missing ingredient(s) added to your shopping list!`);
+        } else {
+            alert("All ingredients are already in your pantry or shopping list!");
+        }
+        return addedCount;
+    } catch (error) {
+        alert("Não foi possível adicionar os ingredientes à lista de compras. Tenta novamente.");
+        return null;
     }
 }
 
@@ -192,8 +197,8 @@ let receitasAtuais = [];
 
 function handleAddMissingIngredients(index) {
     const receita = receitasAtuais[index];
-    if (receita && receita.missedIngredients) {
-        addMissingIngredientsToShoppingList(receita.missedIngredients);
+    if (receita) {
+        return addMissingIngredientsToShoppingList(receita.missedIngredients || []);
     }
 }
 
@@ -220,6 +225,7 @@ async function procurarReceitas() {
     // Estado de loading
     btn.disabled = true;
     msg.hidden = true;
+    receitasAtuais = [];
     lista.innerHTML = '';
     loading.style.display = 'block';
 
@@ -263,7 +269,7 @@ async function procurarReceitas() {
         });
 
         // Desenhar os cartões no HTML
-        receitas.forEach(receita => {
+        receitas.forEach((receita, index) => {
             const analise = analisarReceita(inventario, receita);
 
             const usaExpirados = (receita.usedIngredients || []).some(ing => {
@@ -300,12 +306,12 @@ async function procurarReceitas() {
                         <p style="margin: 2px 0; color: #2e7d32;">
                             <strong>✅ Tens:</strong> ${analise.tens.join(', ')}
                         </p>
-                        <p style="margin: 2px 0; color: #c62828;">
+                        <p data-testid="missing-ingredients" style="margin: 2px 0; color: #c62828;">
                             <strong>❌ Falta:</strong> ${analise.falta.join(', ') || 'Nada!'}
                         </p>
                     </div>
-                     <button class="button button-primary" style="margin-top: 10px; width: 100%;" 
-                        onclick="handleAddMissingIngredients(${receitas.indexOf(receita)})">
+                    <button type="button" data-testid="add-missing-ingredients" class="button button-primary"
+                        style="margin-top: 10px; width: 100%;" onclick="handleAddMissingIngredients(${index})">
                         Adicionar Ingredientes em Falta 🛒
                     </button>
                 </div>
@@ -339,6 +345,7 @@ if (typeof module !== 'undefined' && module.exports) {
         obterPerfilAtivo,
         receitaAdequadaAoPerfil,
         filtrarReceitasPorPerfil,
-        construirUrlReceitas
+        construirUrlReceitas,
+        addMissingIngredientsToShoppingList
     };
 }

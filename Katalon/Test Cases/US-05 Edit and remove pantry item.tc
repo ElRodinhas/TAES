@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Edit and remove pantry item</description>
+   <name>US-05 Edit and remove pantry item</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>057ca51d-cb67-496b-a2cb-5a63b10213db</testCaseGuid>
+</TestCaseEntity>

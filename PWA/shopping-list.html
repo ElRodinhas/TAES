@@ -22,6 +22,14 @@
 
         <p id="shopping-list-msg" role="alert" hidden></p>
 
+        <div class="form-card" style="margin-bottom: 20px;">
+            <h3>Adicionar Item Manualmente</h3>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <input type="text" id="input-item-name" placeholder="Nome do item" style="flex: 2; padding: 8px;">
+                <input type="number" id="input-item-qty" value="1" min="1" style="flex: 1; padding: 8px;">
+                <button id="btn-add-item" class="button button-primary">Adicionar</button>
+            </div>
+        </div>
         <div class="form-card">
             <ul id="shopping-list-container" style="list-style: none; padding: 0;"></ul>
 

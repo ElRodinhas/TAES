@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>US-23: discovery card indicators, single-click transfer and shopping-list duplicate prevention.</description>
+   <name>US-23 Add missing ingredients from recipe cards</name>
+   <tag>us-23</tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>ec63758b-feca-4caa-bf1a-ab74fdbd1423</testCaseGuid>
+</TestCaseEntity>

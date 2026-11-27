@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Add missing ingredients to shopping list</description>
+   <name>US-11 Add missing ingredients to shopping list</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>1221a1fb-1be3-435f-a5e0-def1b60cf7d2</testCaseGuid>
+</TestCaseEntity>

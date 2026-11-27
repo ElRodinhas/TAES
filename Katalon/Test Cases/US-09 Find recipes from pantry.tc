@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description>Find recipes</description>
+   <name>US-09 Find recipes from pantry</name>
+   <tag></tag>
+   <comment></comment>
+   <recordOption>OTHER</recordOption>
+   <testCaseGuid>e953b39c-c18d-4e9c-aeca-3bf9f098e9a4</testCaseGuid>
+</TestCaseEntity>

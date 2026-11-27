@@ -43,7 +43,30 @@ class RecipesSteps {
 			]));
 		"""
 		js.executeScript(script)
-		WebUI.refresh()
+		
+		String mockScript = """
+	        window.fetch = function() {
+	            return Promise.resolve({
+	                ok: true,
+	                json: function() {
+	                    return Promise.resolve({
+	                        results: [
+	                            { 
+	                                id: 1,
+	                                title: 'Mock Recipe with Tomato', 
+	                                image: 'test.jpg', 
+	                                usedIngredients: [{ name: 'tomato' }], 
+	                                missedIngredients: [{ name: 'onion', amount: 1, unit: 'un' }] 
+	                            }
+	                        ]
+	                    });
+	                }
+	            });
+	        };
+	    """
+		js.executeScript(mockScript)
+	
+		
 		WebUI.waitForElementVisible(createTestObject("btn-fetch-recipes"), 10)
 	}
 
@@ -106,7 +129,29 @@ class RecipesSteps {
 			]));
 		"""
 		js.executeScript(script)
-		WebUI.refresh()
+		
+		String mockScript = """
+	        window.fetch = function() {
+	            return Promise.resolve({
+	                ok: true,
+	                json: function() {
+	                    return Promise.resolve({
+	                        results: [
+	                            { 
+	                                id: 1,
+	                                title: 'Mock Recipe with Tomato', 
+	                                image: 'test.jpg', 
+	                                usedIngredients: [{ name: 'tomato' }], 
+	                                missedIngredients: [{ name: 'onion', amount: 1, unit: 'un' }] 
+	                            }
+	                        ]
+	                    });
+	                }
+	            });
+	        };
+	    """
+		js.executeScript(mockScript)
+		
 		WebUI.waitForElementVisible(createTestObject("btn-fetch-recipes"), 10)
 	}
 
