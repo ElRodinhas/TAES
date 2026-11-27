@@ -42,25 +42,6 @@ function obterItensMarcados(lista) {
         .map((item, index) => ({ ...item, originalIndex: index }))
         .filter((item) => Boolean(item.checked));
 }
-document.addEventListener('DOMContentLoaded', () => {
-    renderShoppingList();
-
-    document.getElementById('btn-add-item').addEventListener('click', () => {
-        const nameInput = document.getElementById('input-item-name');
-        const qtyInput = document.getElementById('input-item-qty');
-        
-        const name = nameInput.value.trim();
-        const qty = parseInt(qtyInput.value, 10);
-
-        if (name && qty > 0) {
-            addItem(name, qty);
-            nameInput.value = ''; // Limpa o campo
-            qtyInput.value = '1'; // Reseta a quantidade
-        } else {
-            alert('Por favor, insira um nome e uma quantidade válida.');
-        }
-    });
-});
 
 function renderShoppingList() {
     const container = document.getElementById("shopping-list-container");
@@ -107,23 +88,6 @@ function renderShoppingList() {
         `;
         container.appendChild(li);
     });
-}
-
-function toggleItem(index, checkboxElement) {
-    const list = JSON.parse(localStorage.getItem(SHOPPING_LIST_KEY)) || [];
-    if (!list[index]) return;
-
-    list[index].checked = checkboxElement.checked;
-    localStorage.setItem(SHOPPING_LIST_KEY, JSON.stringify(list));
-
-    const textSpan = checkboxElement.nextElementSibling;
-    if (list[index].checked) {
-        textSpan.style.textDecoration = "line-through";
-        textSpan.style.color = "#888";
-    } else {
-        textSpan.style.textDecoration = "none";
-        textSpan.style.color = "inherit";
-    }
 }
 
 function abrirTransferenciaEmLote() {
@@ -256,6 +220,24 @@ if (typeof document !== "undefined") {
     document.addEventListener("DOMContentLoaded", () => {
         renderShoppingList();
 
+        const btnAdd = document.getElementById('btn-add-item');
+        if (btnAdd) {
+            btnAdd.addEventListener('click', () => {
+                const nameInput = document.getElementById('input-item-name');
+                const qtyInput = document.getElementById('input-item-qty');
+                const name = nameInput.value.trim();
+                const qty = parseInt(qtyInput.value, 10);
+
+                if (name && qty > 0) {
+                    addItem(name, qty);
+                    nameInput.value = '';
+                    qtyInput.value = '1';
+                } else {
+                    alert('Por favor, insira um nome e uma quantidade válida.');
+                }
+            });
+        }
+
         const btnOpen = document.getElementById("btn-open-batch-transfer");
         if (btnOpen) btnOpen.addEventListener("click", abrirTransferenciaEmLote);
 
@@ -274,7 +256,7 @@ if (typeof module !== "undefined" && module.exports) {
         abrirTransferenciaEmLote,
         confirmarTransferenciaEmLote
     };
-
+}
 
 
 function addItem(name, quantity) {
@@ -316,7 +298,7 @@ function saveEdit(index) {
 
 function toggleItem(index, checkboxElement) {
     let list = JSON.parse(localStorage.getItem("smartPantry.shoppingList")) || [];
-    list[index].checked = checkboxElement.checked; 
+    list[index].checked = checkboxElement.checked;
     localStorage.setItem("smartPantry.shoppingList", JSON.stringify(list));
 
     const textSpan = checkboxElement.nextElementSibling;
