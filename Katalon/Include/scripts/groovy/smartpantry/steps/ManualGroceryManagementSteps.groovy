@@ -5,6 +5,7 @@ import com.kms.katalon.core.testobject.TestObject
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import com.kms.katalon.core.model.FailureHandling
 import com.kms.katalon.core.util.KeywordUtil
+import io.cucumber.java.After
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.When
 import io.cucumber.java.en.Then
@@ -80,25 +81,25 @@ class ManualGroceryManagementSteps {
     }
 
     @When("the user edits the item to name {string} and quantity {int}")
-	def userEditsItem(String newName, int newQuantity) {
-	    TestObject editBtn = new TestObject()
-	    editBtn.addProperty("xpath", ConditionType.EQUALS, "(//button[contains(@class, 'btn-edit')])[1]")
-	    WebUI.click(editBtn)
-	    WebUI.delay(1) 
-	
-	    TestObject nameInput = new TestObject()
-	    nameInput.addProperty("xpath", ConditionType.EQUALS, "(//input[contains(@id, 'edit-item-name')])[1]")
-	    WebUI.setText(nameInput, newName)
+    def userEditsItem(String newName, int newQuantity) {
+        TestObject editBtn = new TestObject()
+        editBtn.addProperty("xpath", ConditionType.EQUALS, "(//button[contains(@class, 'btn-edit')])[1]")
+        WebUI.click(editBtn)
+        WebUI.delay(1)
 
-	    TestObject qtyInput = new TestObject()
-	    qtyInput.addProperty("xpath", ConditionType.EQUALS, "(//input[contains(@id, 'edit-item-qty')])[1]")
-	    WebUI.setText(qtyInput, newQuantity.toString())
-	
-	    TestObject saveBtn = new TestObject()
-	    saveBtn.addProperty("xpath", ConditionType.EQUALS, "(//button[contains(@id, 'btn-save-edit')])[1]")
-	    WebUI.click(saveBtn)
-	    WebUI.delay(1)
-	}
+        TestObject nameInput = new TestObject()
+        nameInput.addProperty("xpath", ConditionType.EQUALS, "(//input[contains(@id, 'edit-item-name')])[1]")
+        WebUI.setText(nameInput, newName)
+
+        TestObject qtyInput = new TestObject()
+        qtyInput.addProperty("xpath", ConditionType.EQUALS, "(//input[contains(@id, 'edit-item-qty')])[1]")
+        WebUI.setText(qtyInput, newQuantity.toString())
+
+        TestObject saveBtn = new TestObject()
+        saveBtn.addProperty("xpath", ConditionType.EQUALS, "(//button[contains(@id, 'btn-save-edit')])[1]")
+        WebUI.click(saveBtn)
+        WebUI.delay(1)
+    }
 
     @Then("the item {string} should appear with quantity {int}")
     def itemShouldAppearWithQuantity(String name, int quantity) {
@@ -120,11 +121,11 @@ class ManualGroceryManagementSteps {
     }
 
     @Then("the shopping list should be empty")
-	def shoppingListShouldBeEmpty() {
-	    TestObject emptyMessage = new TestObject()
-	    emptyMessage.addProperty("xpath", ConditionType.EQUALS, "//li[contains(text(), 'A tua lista de compras está vazia')]")
-	    WebUI.verifyElementPresent(emptyMessage, 5, FailureHandling.STOP_ON_FAILURE)
-	}
+    def shoppingListShouldBeEmpty() {
+        TestObject emptyMessage = new TestObject()
+        emptyMessage.addProperty("xpath", ConditionType.EQUALS, "//li[contains(text(), 'A tua lista de compras está vazia')]")
+        WebUI.verifyElementPresent(emptyMessage, 5, FailureHandling.STOP_ON_FAILURE)
+    }
 
     // ---------------------------------------------------------
     // SCENARIO 4: MARK AS PURCHASED
@@ -143,5 +144,13 @@ class ManualGroceryManagementSteps {
         TestObject checkbox = new TestObject()
         checkbox.addProperty("xpath", ConditionType.EQUALS, "(//input[@type='checkbox'])[1]")
         WebUI.verifyElementChecked(checkbox, 5)
+    }
+
+    @After
+    void closeBrowser() {
+        try {
+            WebUI.closeBrowser()
+        } catch (Exception ignored) {
+        }
     }
 }

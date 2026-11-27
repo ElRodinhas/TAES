@@ -170,7 +170,7 @@ class RecipeCardMissingIngredientsSteps {
     @Then('the US-23 shopping page shows exactly {string}')
     void verifyShoppingPage(String names) {
         List rows = WebUI.findWebElements(xpath("//ul[@id='shopping-list-container']/li"), 5)
-        List actualNames = rows.collect { it.getText().split(' - ', 2).last().trim() }
+        List actualNames = rows.collect { it.getText().readLines().first().split(' - ', 2).last().trim() }
         assert actualNames.sort() == names.split(',').collect { it.trim() }.sort()
     }
 
