@@ -198,7 +198,26 @@ function confirmarTransferenciaEmLote() {
         category: document.getElementById(`batch-category-${idx}`).value,
         expiry: document.getElementById(`batch-expiry-${idx}`).value
     }));
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
 
+        const dataHojeFormatada = hoje.toLocaleDateString('pt-PT');
+
+
+
+    for (const item of itensConfigurados) {
+        if (!item.expiry) {
+            mostrarMensagemLista(`Por favor, preenche a data de validade para o produto: ${item.name}`, "form-error");
+            return;
+        }
+
+
+        const dataValidade = new Date(item.expiry + 'T00:00:00'); 
+        if (dataValidade < hoje) {
+            mostrarMensagemLista(`A data de validade do produto "${item.name}" não pode ter data de validade inferior a ${dataHojeFormatada}`, "form-error");
+            return;
+        }
+    }
     try {
         const currentList = JSON.parse(localStorage.getItem(SHOPPING_LIST_KEY)) || [];
         const currentInventory = JSON.parse(localStorage.getItem(INVENTORY_KEY)) || [];
