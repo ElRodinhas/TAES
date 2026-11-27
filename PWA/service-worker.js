@@ -5,7 +5,7 @@ const APP_FILES = [
   './icons/icon-192.png', './icons/icon-512.png',
   './scan.html', './scanner.js', './pantry.html', './pantry.js',
   './recipes.html', './recipes.js', './generated-recipes.js', './date-utils.js',
-  './saved-recipes.html', './recipe-book.js'
+  './saved-recipes.html', './recipe-book.js', './shopping-list.html', './shopping-list.js'
 ];
 
 self.addEventListener('install', (event) => {
